@@ -1,0 +1,92 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+event_venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+settings.py
+media/
+staticfiles/
+static/
+
+# Django migrations cache
+*/migrations/__pycache__/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables
+.env
+.env.*
+
+# macOS files
+.DS_Store
+
+# Logs and reports
+*.log
+*.out
+*.err
+
+# Coverage reports
+.coverage
+htmlcov/
+.coverage.*
+
+# mypy type checker
+.mypy_cache/
+
+# pyre type checker
+.pyre/
+
+# pytest cache
+.pytest_cache/
+
+# celery beat schedule file
+celerybeat-schedule
+
+# dotenv
+.envrc
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Docker files to ignore
+docker-compose.override.yml
+*.dockerfile
+Dockerfile.*
+
+# Docker volumes and temp files
+**/tmp/
+**/cache/
+
+# Postgres data directory (if mounted locally)
+pgdata/
+postgres-data/
+data/postgres/
