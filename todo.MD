@@ -24,7 +24,7 @@ Build a basic Django web application where users can:
 
 ## Database and Models
 
-- [ ] Create `users` app with a custom user model (email-based login)
+- [x] Create `users` app with a custom user model (email-based login)
 - [ ] Create `events` app:
     - [ ] `Event` model (title, description, date, location, created_by)
     - [ ] `Registration` model (user, event, timestamp)
