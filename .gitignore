@@ -90,3 +90,7 @@ Dockerfile.*
 pgdata/
 postgres-data/
 data/postgres/
+
+settings_config.py
+mail.html
+ref.py

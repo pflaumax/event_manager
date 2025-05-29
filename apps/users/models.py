@@ -105,3 +105,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def can_register_for_events(self):
         """Check if user can register for events."""
         return self.is_visitor
+
+    """def cancel_event(self, user):
+        # Allow only the creator to cancel the event.
+        if self.is_visitor:
+            raise PermissionError("Only the event creator can cancel this event.")
+        if self.status != "published":
+            raise ValueError("Only published events can be cancelled.")
+        self.status = "cancelled"
+        self.save()"""

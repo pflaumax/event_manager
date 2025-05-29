@@ -9,7 +9,7 @@ class EventManager(models.Manager):
 
     def upcoming(self):
         """Return events that haven't started yet."""
-        return self.filter(date__gte=timezone.now().date())
+        return self.filter(date__gte=timezone.now().date(), status="published")
 
     def past(self):
         """Return events that have already happened."""
@@ -17,6 +17,10 @@ class EventManager(models.Manager):
 
     def filter_by_creator(self, user):
         return self.filter(created_by=user)
+
+    def published(self):
+        """Return only published events."""
+        return self.filter(status="published")
 
 
 class Event(models.Model):
@@ -42,6 +46,7 @@ class Event(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name="created_events"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     objects = EventManager()
 
@@ -70,8 +75,14 @@ class Event(models.Model):
 
     @property
     def registration_count(self):
-        """Return number of current registrations."""
-        return self.registrations.count()
+        """Return number of current active registrations."""
+        return self.registrations.filter(status="registered").count()
+
+    def save(self, *args, **kwargs):
+        """Overwrite save to handle automatic status updates."""
+        if self.date < timezone.now().date() and self.status == "published":
+            self.status = "completed"
+        super().save(*args, **kwargs)
 
     def cancel_event(self, user):
         """Allow only the creator to cancel the event."""
@@ -90,7 +101,7 @@ class Event(models.Model):
             return False, "Cannot register for past events"
         if self.status != "published":
             return False, "Event is not available for registration"
-        if self.registrations.filter(user=user).exists():
+        if self.registrations.filter(user=user, status="registered").exists():
             return False, "Already registered for this event"
         if self.created_by == user:
             return False, "Cannot register for your own event"
@@ -138,3 +149,13 @@ class Registration(models.Model):
             and self.event.status == "published"
             and self.event.is_upcoming
         )
+
+    def cancel_registration(self, reason=""):
+        """Cancel the registration with optional reason."""
+        if not self.can_cancel():
+            raise ValueError("Cannot cancel this registration")
+
+        self.status = "cancelled"
+        if reason:
+            self.cancellation_reason = reason
+        self.save()
