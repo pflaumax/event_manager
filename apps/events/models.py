@@ -23,7 +23,6 @@ class Event(models.Model):
     """Model representing an event."""
 
     STATUS_CHOICES = (
-        ("draft", "Draft"),
         ("published", "Published"),
         ("cancelled", "Cancelled"),
         ("completed", "Completed"),
@@ -36,23 +35,106 @@ class Event(models.Model):
     location = models.CharField(max_length=200, help_text="Event venue or address")
     date = models.DateField(help_text="Event date")
     start_time = models.TimeField(help_text="Event start time")
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
-    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="published"
+    )
+    created_by = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="created_events"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = EventManager()
+
+    class Meta:
+        ordering = ["date", "start_time"]
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["created_by"]),
+        ]
+        constraints = (
+            models.CheckConstraint(
+                check=models.Q(date__gte=timezone.now().date())
+                | models.Q(status="completed"),
+                name="no_past_events_unless_completed",
+            ),
+        )
 
     def __str__(self):
         return f"{self.title} - {self.date}"
 
+    @property
+    def is_upcoming(self):
+        """Check if event is in the future."""
+        return self.date >= timezone.now().date()
+
+    @property
+    def registration_count(self):
+        """Return number of current registrations."""
+        return self.registrations.count()
+
+    def cancel_event(self, user):
+        """Allow only the creator to cancel the event."""
+        if self.created_by != user:
+            raise PermissionError("Only the event creator can cancel this event.")
+        if self.status != "published":
+            raise ValueError("Only published events can be cancelled.")
+        self.status = "cancelled"
+        self.save()
+
+    def can_register(self, user):
+        """Check if a user can register for this event."""
+        if not user.can_register_for_events():
+            return False, "Only visitors can register for events."
+        if not self.is_upcoming:
+            return False, "Cannot register for past events"
+        if self.status != "published":
+            return False, "Event is not available for registration"
+        if self.registrations.filter(user=user).exists():
+            return False, "Already registered for this event"
+        if self.created_by == user:
+            return False, "Cannot register for your own event"
+        return True, "Can register"
+
 
 class Registration(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    """Model representing user registration for an event."""
+
+    STATUS_CHOICES = (
+        ("registered", "Registered"),
+        ("cancelled", "Cancelled"),
+        ("attended", "Attended"),
+    )
+
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="registrations"
+    )
+    event = models.ForeignKey(
+        Event, on_delete=models.CASCADE, related_name="registrations"
+    )
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="registered"
+    )
+    registered_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["user", "event"], name="unique_user_event")
         ]
+        indexes = [
+            models.Index(fields=["user", "status"]),
+            models.Index(fields=["event", "status"]),
+        ]
+        ordering = ["-registered_at"]
 
     def __str__(self):
-        return f"{self.user} registered for {self.event} on {self.timestamp}"
+        return f"{self.user} - {self.event.title} {self.status}"
+
+    def can_cancel(self):
+        """Check if registration can be cancelled."""
+        return (
+            self.status == "registered"
+            and self.event.status == "published"
+            and self.event.is_upcoming
+        )

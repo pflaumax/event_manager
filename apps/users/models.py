@@ -39,7 +39,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    """Custom user model with email authentication."""
+    """Custom user model with email authentication and role-based access."""
 
     ROLE_TYPE_CHOICES = (
         ("creator", "Event Creator"),
