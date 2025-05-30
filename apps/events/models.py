@@ -28,19 +28,32 @@ class Event(models.Model):
 
     STATUS_CHOICES = (
         ("published", "Published"),
-        ("cancelled", "Cancelled"),
         ("completed", "Completed"),
+        ("cancelled", "Cancelled"),
     )
 
-    title = models.CharField(max_length=100, validators=[MinLengthValidator(3)])
-    description = models.TextField(
-        max_length=1000, help_text="Detailed description of the event"
+    title = models.CharField(
+        max_length=100,
+        validators=[MinLengthValidator(3)],
     )
-    location = models.CharField(max_length=200, help_text="Event venue or address")
-    date = models.DateField(help_text="Event date")
-    start_time = models.TimeField(help_text="Event start time")
+    description = models.TextField(
+        max_length=1000,
+        help_text="Detailed description of the event",
+    )
+    location = models.CharField(
+        max_length=200,
+        help_text="Event venue or address",
+    )
+    date = models.DateField(
+        help_text="Event date",
+    )
+    start_time = models.TimeField(
+        help_text="Event start time",
+    )
     status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="published"
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="published",
     )
     created_by = models.ForeignKey(
         CustomUser, on_delete=models.CASCADE, related_name="created_events"
@@ -59,7 +72,7 @@ class Event(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.title} - {self.date}"
+        return f"{self.title} - {self.date}, {self.status}"
 
     @property
     def is_upcoming(self):
@@ -69,7 +82,7 @@ class Event(models.Model):
     @property
     def registration_count(self):
         """Return number of current active registrations."""
-        return self.registrations.filter(status="registered").count()
+        return self.registrations.filter(status="registered").count()  # type: ignore
 
     def save(self, *args, **kwargs):
         """Overwrite save to handle automatic status updates."""
@@ -96,10 +109,10 @@ class Event(models.Model):
             return False, "Cannot register for past events"
         if self.status != "published":
             return False, "Event is not available for registration"
-        if self.registrations.filter(user=user, status="registered").exists():
+        if self.registrations.filter(user=user, status="registered").exists():  # type: ignore
             return False, "Already registered for this event"
         if self.created_by == user:
-            return False, "Cannot register for your own event"
+            return False, "Event creators cannot register for their own events"
         return True, "Can register"
 
 
@@ -145,12 +158,10 @@ class Registration(models.Model):
             and self.event.is_upcoming
         )
 
-    def cancel_registration(self, reason=""):
-        """Cancel the registration with optional reason."""
+    def cancel_registration(self):
+        """Cancel the registration."""
         if not self.can_cancel():
             raise ValueError("Cannot cancel this registration")
 
         self.status = "cancelled"
-        if reason:
-            self.cancellation_reason = reason
         self.save()
