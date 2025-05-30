@@ -57,13 +57,6 @@ class Event(models.Model):
             models.Index(fields=["status"]),
             models.Index(fields=["created_by"]),
         ]
-        constraints = (
-            models.CheckConstraint(
-                check=models.Q(date__gte=timezone.now().date())
-                | models.Q(status="completed"),
-                name="no_past_events_unless_completed",
-            ),
-        )
 
     def __str__(self):
         return f"{self.title} - {self.date}"
@@ -82,6 +75,8 @@ class Event(models.Model):
         """Overwrite save to handle automatic status updates."""
         if self.date < timezone.now().date() and self.status == "published":
             self.status = "completed"
+        if self.date < timezone.now().date() and self.status != "completed":
+            raise ValueError("Cannot set past date unless status is 'completed'")
         super().save(*args, **kwargs)
 
     def cancel_event(self, user):
