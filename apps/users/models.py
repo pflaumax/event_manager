@@ -4,12 +4,13 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
-from django.core.validators import RegexValidator
+
+from django.core.exceptions import ValidationError
 
 
 class CustomUserManager(BaseUserManager):
     """
-    Manager for the CustomUser model.
+    Manager for the CustomUser model. Email-based authentication.
     Responsible for creating regular users and superusers.
     """
 
@@ -47,18 +48,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
 
     email = models.EmailField(
-        unique=True, blank=False, null=False, help_text="Email address used for login"
+        unique=True,
+        blank=False,
+        null=False,
+        help_text="Email address used for login",
     )
     full_name = models.CharField(
         max_length=100,
         blank=False,
         null=False,
-        validators=[
-            RegexValidator(
-                regex=r"^[a-zA-Z\s\-\'\.]+$",
-                message="Full name can only contain letters, spaces, hyphens, apostrophes, and periods.",
-            )
-        ],
+        help_text="Enter your name, pseudonym, or group name",
     )
     role = models.CharField(
         max_length=10,
@@ -88,6 +87,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.full_name} ({self.email})"
 
+    def clean_name(self):
+        super().clean()
+        if self.full_name:
+            self.full_name = self.full_name.strip()
+            if not any(char.isalnum() for char in self.full_name):
+                raise ValidationError(
+                    "Name must include at least one letter or number."
+                )
+
     @property
     def is_creator(self):
         """Check if user is an event creator."""
@@ -105,12 +113,3 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def can_register_for_events(self):
         """Check if user can register for events."""
         return self.is_visitor
-
-    """def cancel_event(self, user):
-        # Allow only the creator to cancel the event.
-        if self.is_visitor:
-            raise PermissionError("Only the event creator can cancel this event.")
-        if self.status != "published":
-            raise ValueError("Only published events can be cancelled.")
-        self.status = "cancelled"
-        self.save()"""
