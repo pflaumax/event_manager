@@ -73,8 +73,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["full_name"]
+    USERNAME_FIELD = "email"  # Use email instead username for login by default
+    REQUIRED_FIELDS = ["full_name"]  # Full name required for superuser creation
 
     class Meta:
         verbose_name = "User"
