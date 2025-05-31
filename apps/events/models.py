@@ -85,7 +85,13 @@ class Event(models.Model):
         return self.registrations.filter(status="registered").count()
 
     def save(self, *args, **kwargs):
-        """Overwrite save to handle automatic status updates."""
+        """
+        Override save method to enforce business logic and handle event status updates.
+        """
+        if not self.created_by.is_creator:
+            raise PermissionError(
+                "Only users which role is 'creator' can create events"
+            )
         if self.date < timezone.now().date() and self.status == "published":
             self.status = "completed"
         if self.date < timezone.now().date() and self.status != "completed":
