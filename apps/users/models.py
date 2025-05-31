@@ -16,8 +16,8 @@ class CustomUserManager(BaseUserManager):
 
     def create_user(self, email, username, password=None, role="visitor"):
         """
-        Create and save a new user with the given email, username, password,
-        and role.
+        Create and save a new user with the given email,
+        username, password, and role.
         """
         if not email:
             raise ValueError("Users must have an email address")
@@ -27,6 +27,7 @@ class CustomUserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, role=role)
         user.set_password(password)
+        user.full_clean()
         user.save(using=self._db)
         return user
 
@@ -59,7 +60,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         unique=True,
         blank=False,
         null=False,
-        help_text="Enter your name, pseudonym, or group name",
+        help_text="Enter your name, group name or pseudonym",
     )
 
     role = models.CharField(
@@ -91,7 +92,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.username} ({self.email}), {self.role}"
 
-    def clean_name(self):
+    def clean(self):
+        """Perform custom username validation for the CustomUser model."""
         super().clean()
         if self.username:
             self.username = self.username.strip()
