@@ -82,7 +82,7 @@ class Event(models.Model):
     @property
     def registration_count(self):
         """Return number of current active registrations."""
-        return self.registrations.filter(status="registered").count()  # type: ignore
+        return self.registrations.filter(status="registered").count()
 
     def save(self, *args, **kwargs):
         """Overwrite save to handle automatic status updates."""
@@ -109,7 +109,7 @@ class Event(models.Model):
             return False, "Cannot register for past events"
         if self.status != "published":
             return False, "Event is not available for registration"
-        if self.registrations.filter(user=user, status="registered").exists():  # type: ignore
+        if self.registrations.filter(user=user, status="registered").exists():
             return False, "Already registered for this event"
         if self.created_by == user:
             return False, "Event creators cannot register for their own events"

@@ -14,25 +14,25 @@ class CustomUserManager(BaseUserManager):
     Responsible for creating regular users and superusers.
     """
 
-    def create_user(self, email, full_name, password=None, role="visitor"):
+    def create_user(self, email, username, password=None, role="visitor"):
         """
-        Create and save a new user with the given email, full name, password,
+        Create and save a new user with the given email, username, password,
         and role.
         """
         if not email:
             raise ValueError("Users must have an email address")
-        if not full_name:
-            raise ValueError("Users must have a full name or pseudonym")
+        if not username:
+            raise ValueError("Users must have a username or event pseudonym")
 
         email = self.normalize_email(email)
-        user = self.model(email=email, full_name=full_name, role=role)
+        user = self.model(email=email, username=username, role=role)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, full_name, password=None):
+    def create_superuser(self, email, username, password=None):
         """Create and save a new superuser with all permissions."""
-        user = self.create_user(email, full_name, password, role="creator")
+        user = self.create_user(email, username, password, role="creator")
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
@@ -53,12 +53,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         null=False,
         help_text="Email address used for login",
     )
-    full_name = models.CharField(
+
+    username = models.CharField(
         max_length=100,
+        unique=True,
         blank=False,
         null=False,
         help_text="Enter your name, pseudonym, or group name",
     )
+
     role = models.CharField(
         max_length=10,
         choices=ROLE_TYPE_CHOICES,
@@ -67,6 +70,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         null=False,
         help_text="User role determines permissions",
     )
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -74,7 +78,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = "email"  # Use email instead username for login by default
-    REQUIRED_FIELDS = ["full_name"]  # Full name required for superuser creation
+    REQUIRED_FIELDS = ["username"]  # Username required for superuser creation
 
     class Meta:
         verbose_name = "User"
@@ -85,13 +89,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ]
 
     def __str__(self):
-        return f"{self.full_name} ({self.email}), {self.role}"
+        return f"{self.username} ({self.email}), {self.role}"
 
     def clean_name(self):
         super().clean()
-        if self.full_name:
-            self.full_name = self.full_name.strip()
-            if not any(char.isalnum() for char in self.full_name):
+        if self.username:
+            self.username = self.username.strip()
+            if not any(char.isalnum() for char in self.username):
                 raise ValidationError(
                     "Name must include at least one letter or number."
                 )
