@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinLengthValidator
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from apps.users.models import CustomUser
 
@@ -34,24 +35,38 @@ class Event(models.Model):
 
     title = models.CharField(
         max_length=100,
-        validators=[MinLengthValidator(3)],
+        blank=False,
+        null=False,
+        validators=[
+            MinLengthValidator(3, message="Title must be at least 3 characters long.")
+        ],
     )
     description = models.TextField(
         max_length=1000,
+        blank=False,
+        null=False,
         help_text="Detailed description of the event",
     )
     location = models.CharField(
         max_length=200,
+        blank=False,
+        null=False,
         help_text="Event venue or address",
     )
     date = models.DateField(
+        blank=False,
+        null=False,
         help_text="Event date",
     )
     start_time = models.TimeField(
+        blank=False,
+        null=False,
         help_text="Event start time",
     )
     status = models.CharField(
         max_length=10,
+        blank=False,
+        null=False,
         choices=STATUS_CHOICES,
         default="published",
     )
@@ -74,6 +89,36 @@ class Event(models.Model):
     def __str__(self):
         return f"{self.title} - {self.date}, {self.status}"
 
+    def clean(self):
+        """Perform custom validation for the Event model."""
+        super().clean()
+        fields_to_check = {
+            "title": self.title,
+            "description": self.description,
+            "location": self.location,
+        }
+        for field_name in ["title", "description", "location"]:
+            value = getattr(self, field_name)
+            if value:
+                cleaned_value = value.strip()
+                setattr(self, field_name, cleaned_value)
+                if not any(char.isalnum() for char in cleaned_value):
+                    raise ValidationError(
+                        {
+                            field_name: f"{field_name.capitalize()} must contain at least one letter or number."
+                        }
+                    )
+        if (
+            self.date
+            and self.date < timezone.now().date()
+            and self.status != "completed"
+        ):
+            raise ValidationError(
+                {
+                    "date": "Event date cannot be in the past unless status is 'completed'."
+                }
+            )
+
     @property
     def is_upcoming(self):
         """Check if event is in the future."""
@@ -88,14 +133,17 @@ class Event(models.Model):
         """
         Override save method to enforce business logic and handle event status updates.
         """
+        self.full_clean()
         if not self.created_by.is_creator:
             raise PermissionError(
                 "Only users which role is 'creator' can create events"
             )
-        if self.date < timezone.now().date() and self.status == "published":
-            self.status = "completed"
-        if self.date < timezone.now().date() and self.status != "completed":
-            raise ValueError("Cannot set past date unless status is 'completed'")
+        if self.date < timezone.now().date():
+            if self.status == "published":
+                self.status = "completed"
+            elif self.status != "completed":
+                raise ValueError("Cannot set a past date unless status is 'completed'.")
+
         super().save(*args, **kwargs)
 
     def cancel_event(self, user):

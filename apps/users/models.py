@@ -4,7 +4,7 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
-
+from django.core.validators import MinLengthValidator
 from django.core.exceptions import ValidationError
 
 
@@ -60,6 +60,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         unique=True,
         blank=False,
         null=False,
+        validators=[
+            MinLengthValidator(3, message="Title must be at least 3 characters long.")
+        ],
         help_text="Enter your name, group name or pseudonym",
     )
 
