@@ -155,8 +155,8 @@ class Event(models.Model):
         if self.created_by != user:
             raise PermissionError("Only the event creator can cancel this event.")
         if self.status == "cancelled":
-            raise ValueError("Event is alredy cancelled.")
-        if self.status is not ["published"]:
+            raise ValueError("Event is already cancelled.")
+        if self.status != "published":
             raise ValueError("Only published events can be cancelled.")
 
         self.status = "cancelled"
