@@ -1,4 +1,3 @@
-from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -6,6 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.core.validators import MinLengthValidator
 from django.core.exceptions import ValidationError
+from django.db import models
 
 
 class CustomUserManager(BaseUserManager):
@@ -93,7 +93,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ]
 
     def __str__(self):
-        return f"{self.username} ({self.email}), {self.role}"
+        return f"{self.username} ({self.email}) - {self.role}"
 
     def clean(self):
         """Perform custom username validation for the CustomUser model."""
@@ -102,7 +102,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             self.username = self.username.strip()
             if not any(char.isalnum() for char in self.username):
                 raise ValidationError(
-                    "Name must include at least one letter or number."
+                    {"username": "Username must include at least one letter or number."}
                 )
 
     @property
@@ -117,8 +117,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def can_create_events(self):
         """Check if user can create events."""
-        return self.is_creator
+        return self.is_creator and self.is_active
 
     def can_register_for_events(self):
         """Check if user can register for events."""
-        return self.is_visitor
+        return self.is_visitor and self.is_active
