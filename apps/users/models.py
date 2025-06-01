@@ -117,8 +117,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def can_create_events(self):
         """Check if user can create events."""
-        return self.is_creator and self.is_active
+        return self.is_creator
 
     def can_register_for_events(self):
         """Check if user can register for events."""
-        return self.is_visitor and self.is_active
+        return self.is_visitor

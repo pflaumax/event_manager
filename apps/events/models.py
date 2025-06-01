@@ -1,7 +1,8 @@
-from django.db import models
-from django.core.validators import MinLengthValidator
 from django.core.exceptions import ValidationError
+from django.core.validators import MinLengthValidator
+from django.db import models
 from django.utils import timezone
+
 from apps.users.models import CustomUser
 
 
@@ -16,12 +17,12 @@ class EventManager(models.Manager):
         """Return events that have already happened."""
         return self.filter(date__lt=timezone.now().date())
 
-    def filter_by_creator(self, user):
-        return self.filter(created_by=user)
-
     def published(self):
         """Return only published events."""
         return self.filter(status="published")
+
+    def filter_by_creator(self, user):
+        return self.filter(created_by=user)
 
 
 class Event(models.Model):
@@ -71,7 +72,9 @@ class Event(models.Model):
         default="published",
     )
     created_by = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="created_events"
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="created_events",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -87,11 +90,13 @@ class Event(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.title} - {self.date}, {self.status}"
+        return f"{self.title} - {self.date} ({self.status})"
 
     def clean(self):
         """Perform custom event validation for the Event model."""
         super().clean()
+
+        # Clean and validate text fields
         fields_to_check = ["title", "description", "location"]
         for field_name in fields_to_check:
             value = getattr(self, field_name)
@@ -104,16 +109,84 @@ class Event(models.Model):
                             field_name: f"{field_name.capitalize()} must contain at least one letter or number."
                         }
                     )
-        if (
-            self.date
-            and self.date < timezone.now().date()
-            and self.status != "completed"
-        ):
-            raise ValidationError(
-                {
-                    "date": "Event date cannot be in the past unless status is 'completed'."
-                }
-            )
+
+        # Validate event date
+        if self.date:
+            current_date = timezone.now().date()
+            if self.date < current_date and self.status not in [
+                "completed",
+                "cancelled",
+            ]:
+                raise ValidationError(
+                    {
+                        "date": "Event date cannot be in the past unless status is 'completed' or 'cancelled'."
+                    }
+                )
+
+    def save(self, *args, **kwargs):
+        """
+        Override save method to enforce logic and handle event status updates.
+        """
+        # Validate before saving
+        self.full_clean()
+
+        # Check creator permissions
+        if not self.created_by.is_creator:
+            raise PermissionError("Only users with role 'creator' can create events.")
+
+        # Get previous status for comparison
+        previous_status = None
+        if self.pk:
+            previous_status = Event.objects.get(pk=self.pk).status
+
+        # Auto update status for past events
+        current_date = timezone.now().date()
+        if self.date and self.date < current_date and self.status == "published":
+            self.status = "completed"
+
+        super().save(*args, **kwargs)
+
+        # Handle cascading status changes
+        if previous_status != "cancelled" and self.status == "cancelled":
+            self._cancel_all_registrations()  # registrations.filter(status="registered").update(status="cancelled")
+
+    def cancel_event(self, user):
+        """Allow only the creator to cancel the event."""
+        if self.created_by != user:
+            raise PermissionError("Only the event creator can cancel this event.")
+        if self.status == "cancelled":
+            raise ValueError("Event is alredy cancelled.")
+        if self.status is not ["published"]:
+            raise ValueError("Only published events can be cancelled.")
+
+        self.status = "cancelled"
+        self.save()
+
+    def can_register(self, user):
+        """Check if a user can register for this event."""
+        # Check user permissions
+        if not user.is_authenticated:
+            return False, "User must be logged in to register."
+        if not user.can_register_for_events():
+            return False, "Only visitors can register for events."
+
+        # Check event status and timing
+        if not self.is_upcoming:
+            return False, "Cannot register for past events."
+        if self.status != "published":
+            return False, "Event is not available for registration."
+
+        # Check existing registration
+        if self.registrations.filter(user=user, status="registered").exists():
+            return False, "Already registered for this event."
+
+        return True, "Can register."
+
+    def _cancel_all_registrations(self):
+        """Cancel all active registrations for this event."""
+        self.registrations.filter(status="registered").update(
+            status="cancelled", updated_at=timezone.now()
+        )
 
     @property
     def is_upcoming(self):
@@ -121,52 +194,19 @@ class Event(models.Model):
         return self.date >= timezone.now().date()
 
     @property
+    def is_past(self):
+        """Check if event is in the past."""
+        return self.date < timezone.now().date()
+
+    @property
     def registration_count(self):
         """Return number of current active registrations."""
         return self.registrations.filter(status="registered").count()
 
-    def save(self, *args, **kwargs):
-        """
-        Override save method to enforce business logic and handle event status updates.
-        """
-        self.full_clean()
-
-        if not self.created_by.is_creator:
-            raise PermissionError("Only users with role 'creator' can create events.")
-        previous_status = None
-        if self.pk:
-            previous_status = Event.objects.get(pk=self.pk).status
-        if (
-            self.date
-            and self.date < timezone.now().date()
-            and self.status == "published"
-        ):
-            self.status = "completed"
-        super().save(*args, **kwargs)
-
-        if previous_status != "cancelled" and self.status == "cancelled":
-            self.registrations.filter(status="registered").update(status="cancelled")
-
-    def cancel_event(self, user):
-        """Allow only the creator to cancel the event."""
-        if self.created_by != user:
-            raise PermissionError("Only the event creator can cancel this event.")
-        if self.status != "published":
-            raise ValueError("Only published events can be cancelled.")
-        self.status = "cancelled"
-        self.save()
-
-    def can_register(self, user):
-        """Check if a user can register for this event."""
-        if not user.can_register_for_events():
-            return False, "Only visitors can register for events."
-        if not self.is_upcoming:
-            return False, "Cannot register for past events."
-        if self.status != "published":
-            return False, "Event is not available for registration."
-        if self.registrations.filter(user=user, status="registered").exists():
-            return False, "Already registered for this event."
-        return True, "Can register."
+    @property
+    def can_be_cancelled(self):
+        """Check if event can be cancelled."""
+        return self.status == "published"
 
 
 class Registration(models.Model):
@@ -179,20 +219,29 @@ class Registration(models.Model):
     )
 
     user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, related_name="registrations"
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="registrations",
     )
     event = models.ForeignKey(
-        Event, on_delete=models.CASCADE, related_name="registrations"
+        Event,
+        on_delete=models.CASCADE,
+        related_name="registrations",
     )
     status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="registered"
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="registered",
     )
     registered_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["user", "event"], name="unique_user_event")
+            models.UniqueConstraint(
+                fields=["user", "event"],
+                name="unique_user_event_registration",
+            )
         ]
         indexes = [
             models.Index(fields=["user", "status"]),
@@ -201,21 +250,35 @@ class Registration(models.Model):
         ordering = ["-registered_at"]
 
     def __str__(self):
-        return f"{self.user} - {self.event.title} {self.status}"
+        return f"{self.user.username} - {self.event.title} ({self.status})"
 
     def clean(self):
-        """Repform custom validation for registration model."""
+        """Perform custom validation for registration model."""
         super().clean()
+
+        # Validate new registrations or status changes to registered
         if self.pk is None or self.status == "registered":
             can_register, reason = self.event.can_register(self.user)
             if not can_register:
                 raise ValidationError(reason)
 
-        if self.status == "cancelled":
-            if self.pk:
+        # Validate cancellation
+        if self.status == "cancelled" and self.pk:
+            try:
                 original = Registration.objects.get(pk=self.pk)
+                if original.status != "registered":
+                    raise ValidationError("Can only cancel active registrations.")
                 if not original.can_cancel():
                     raise ValidationError("Cannot cancel this registration.")
+            except Registration.DoesNotExist:
+                pass
+
+        # Validate attendance marking
+        if self.status == "attended":
+            if self.event.status != "completed":
+                raise ValidationError("Can only mark attendance for completed events.")
+            if not self.event.is_past:
+                raise ValidationError("Can only mark attendance for past events.")
 
     def save(self, *args, **kwargs):
         """Ensure validation is always performed before saving."""
@@ -236,4 +299,14 @@ class Registration(models.Model):
             raise ValueError("Cannot cancel this registration.")
 
         self.status = "cancelled"
+        self.save()
+
+    def mark_attended(self):
+        """Mark registration as attended (for completed events)."""
+        if self.status != "registered":
+            raise ValueError("Can only mark attended for active registrations.")
+        if not self.event.is_past or self.event.status != "completed":
+            raise ValueError("Can only mark attendance for completed events.")
+
+        self.status = "attended"
         self.save()
