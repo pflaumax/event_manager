@@ -20,9 +20,9 @@ class CustomUserManager(BaseUserManager):
         username, password, and role.
         """
         if not email:
-            raise ValueError("Users must have an email address")
+            raise ValueError("Users must have an email address.")
         if not username:
-            raise ValueError("Users must have a username or event pseudonym")
+            raise ValueError("Users must have a username or event pseudonym.")
 
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, role=role)
@@ -52,7 +52,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         unique=True,
         blank=False,
         null=False,
-        help_text="Email address used for login",
+        help_text="Email address used for login.",
     )
 
     username = models.CharField(
@@ -63,7 +63,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         validators=[
             MinLengthValidator(3, message="Title must be at least 3 characters long.")
         ],
-        help_text="Enter your name, group name or pseudonym",
+        help_text="Enter your name, group name or pseudonym.",
     )
 
     role = models.CharField(
@@ -72,7 +72,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         default="visitor",
         blank=False,
         null=False,
-        help_text="User role determines permissions",
+        help_text="User role determines permissions.",
     )
 
     is_active = models.BooleanField(default=True)

@@ -45,23 +45,23 @@ class Event(models.Model):
         max_length=1000,
         blank=False,
         null=False,
-        help_text="Detailed description of the event",
+        help_text="Detailed description of the event.",
     )
     location = models.CharField(
         max_length=200,
         blank=False,
         null=False,
-        help_text="Event venue or address",
+        help_text="Event venue or address.",
     )
     date = models.DateField(
         blank=False,
         null=False,
-        help_text="Event date",
+        help_text="Event date.",
     )
     start_time = models.TimeField(
         blank=False,
         null=False,
-        help_text="Event start time",
+        help_text="Event start time.",
     )
     status = models.CharField(
         max_length=10,
@@ -90,14 +90,10 @@ class Event(models.Model):
         return f"{self.title} - {self.date}, {self.status}"
 
     def clean(self):
-        """Perform custom validation for the Event model."""
+        """Perform custom event validation for the Event model."""
         super().clean()
-        fields_to_check = {
-            "title": self.title,
-            "description": self.description,
-            "location": self.location,
-        }
-        for field_name in ["title", "description", "location"]:
+        fields_to_check = ["title", "description", "location"]
+        for field_name in fields_to_check:
             value = getattr(self, field_name)
             if value:
                 cleaned_value = value.strip()
@@ -135,14 +131,13 @@ class Event(models.Model):
         """
         self.full_clean()
         if not self.created_by.is_creator:
-            raise PermissionError(
-                "Only users which role is 'creator' can create events"
-            )
-        if self.date < timezone.now().date():
-            if self.status == "published":
-                self.status = "completed"
-            elif self.status != "completed":
-                raise ValueError("Cannot set a past date unless status is 'completed'.")
+            raise PermissionError("Only users with role 'creator' can create events.")
+        if (
+            self.date
+            and self.date < timezone.now().date()
+            and self.status == "published"
+        ):
+            self.status = "completed"
 
         super().save(*args, **kwargs)
 
@@ -160,14 +155,12 @@ class Event(models.Model):
         if not user.can_register_for_events():
             return False, "Only visitors can register for events."
         if not self.is_upcoming:
-            return False, "Cannot register for past events"
+            return False, "Cannot register for past events."
         if self.status != "published":
-            return False, "Event is not available for registration"
+            return False, "Event is not available for registration."
         if self.registrations.filter(user=user, status="registered").exists():
-            return False, "Already registered for this event"
-        if self.created_by == user:
-            return False, "Event creators cannot register for their own events"
-        return True, "Can register"
+            return False, "Already registered for this event."
+        return True, "Can register."
 
 
 class Registration(models.Model):
@@ -204,6 +197,18 @@ class Registration(models.Model):
     def __str__(self):
         return f"{self.user} - {self.event.title} {self.status}"
 
+    def clean(self):
+        """Repform custom validation for registration model."""
+        super().clean()
+        can_register, reason = self.event.can_register(self.user)
+        if not can_register:
+            raise ValidationError(reason)
+
+    def save(self, *args, **kwargs):
+        """Ensure validation is always performed before saving."""
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def can_cancel(self):
         """Check if registration can be cancelled."""
         return (
@@ -215,7 +220,7 @@ class Registration(models.Model):
     def cancel_registration(self):
         """Cancel the registration."""
         if not self.can_cancel():
-            raise ValueError("Cannot cancel this registration")
+            raise ValueError("Cannot cancel this registration.")
 
         self.status = "cancelled"
         self.save()
