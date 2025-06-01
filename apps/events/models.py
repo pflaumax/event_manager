@@ -130,6 +130,10 @@ class Event(models.Model):
         Override save method to enforce business logic and handle event status updates.
         """
         self.full_clean()
+        previous_status = None
+        if self.pk:
+            previous_status = Event.objects.get(pk=self.pk).status
+
         if not self.created_by.is_creator:
             raise PermissionError("Only users with role 'creator' can create events.")
         if (
@@ -138,8 +142,11 @@ class Event(models.Model):
             and self.status == "published"
         ):
             self.status = "completed"
-
+        is_status_changing_to_cancelled = self.pk and self.status == "cancelled"
         super().save(*args, **kwargs)
+
+        if previous_status != "cancelled" and self.status == "cancelled":
+            self.registrations.filter(status="registered").update(status="cancelled")
 
     def cancel_event(self, user):
         """Allow only the creator to cancel the event."""
@@ -203,6 +210,8 @@ class Registration(models.Model):
         can_register, reason = self.event.can_register(self.user)
         if not can_register:
             raise ValidationError(reason)
+        if self.status == "cancelled" and not self.can_cancel():
+            raise ValidationError("Cannot cancel this registration.")
 
     def save(self, *args, **kwargs):
         """Ensure validation is always performed before saving."""
