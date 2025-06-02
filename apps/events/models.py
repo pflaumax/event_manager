@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils import timezone
-
 from apps.users.models import CustomUser
 
 
@@ -96,6 +95,10 @@ class Event(models.Model):
         """Perform custom event validation for the Event model."""
         super().clean()
 
+        # Check creator permissions
+        if not self.created_by.is_creator:
+            raise PermissionError("Only users with role 'creator' can create events.")
+
         # Clean and validate text fields
         fields_to_check = ["title", "description", "location"]
         for field_name in fields_to_check:
@@ -130,10 +133,6 @@ class Event(models.Model):
         # Validate before saving
         self.full_clean()
 
-        # Check creator permissions
-        if not self.created_by.is_creator:
-            raise PermissionError("Only users with role 'creator' can create events.")
-
         # Get previous status for comparison
         previous_status = None
         if self.pk:
@@ -148,7 +147,7 @@ class Event(models.Model):
 
         # Handle cascading status changes
         if previous_status != "cancelled" and self.status == "cancelled":
-            self._cancel_all_registrations()  # registrations.filter(status="registered").update(status="cancelled")
+            self._cancel_all_registrations()
 
     def cancel_event(self, user):
         """Allow only the creator to cancel the event."""
