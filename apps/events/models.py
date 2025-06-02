@@ -8,19 +8,16 @@ from apps.users.models import CustomUser
 class EventManager(models.Manager):
     """Custom manager for Event model."""
 
-    def upcoming(self):
-        """Return events that haven't started yet."""
-        return self.filter(date__gte=timezone.now().date(), status="published")
-
     def past(self):
         """Return events that have already happened."""
         return self.filter(date__lt=timezone.now().date())
 
     def published(self):
-        """Return only published events."""
+        """Return only published events (upcoming)."""
         return self.filter(status="published")
 
     def filter_by_creator(self, user):
+        """Filter events by creator."""
         return self.filter(created_by=user)
 
 
@@ -81,6 +78,11 @@ class Event(models.Model):
     objects = EventManager()
 
     class Meta:
+        """
+        Orders events by date and start time.
+        Adds indexes for faster filtering by date, status, and creator
+        """
+
         ordering = ["date", "start_time"]
         indexes = [
             models.Index(fields=["date"]),
@@ -89,6 +91,7 @@ class Event(models.Model):
         ]
 
     def __str__(self):
+        """String representation."""
         return f"{self.title} - {self.date} ({self.status})"
 
     def clean(self):
@@ -100,22 +103,24 @@ class Event(models.Model):
             raise PermissionError("Only users with role 'creator' can create events.")
 
         # Clean and validate text fields
-        fields_to_check = ["title", "description", "location"]
-        for field_name in fields_to_check:
-            value = getattr(self, field_name)
-            if value:
-                cleaned_value = value.strip()
-                setattr(self, field_name, cleaned_value)
-                if not any(char.isalnum() for char in cleaned_value):
-                    raise ValidationError(
-                        {
-                            field_name: f"{field_name.capitalize()} must contain at least one letter or number."
-                        }
-                    )
+        for field in ["title", "description", "location"]:
+            value = (getattr(self, field) or "").strip()
+            setattr(self, field, value)
 
-        # Validate event date
+            if not any(c.isalnum() for c in value):
+                raise ValidationError(
+                    {
+                        field: f"{field.capitalize()} must contain at least one letter or number."
+                    }
+                )
+
+        # Auto-update status for past events
         if self.date:
             current_date = timezone.now().date()
+
+            if self.date < current_date and self.status == "published":
+                self.status = "completed"
+
             if self.date < current_date and self.status not in [
                 "completed",
                 "cancelled",
@@ -137,11 +142,6 @@ class Event(models.Model):
         previous_status = None
         if self.pk:
             previous_status = Event.objects.get(pk=self.pk).status
-
-        # Auto update status for past events
-        current_date = timezone.now().date()
-        if self.date and self.date < current_date and self.status == "published":
-            self.status = "completed"
 
         super().save(*args, **kwargs)
 
@@ -235,6 +235,11 @@ class Registration(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        """
+        Adds constraints for each user can only register once per event.
+        Adds indexes for faster filtering by user-status and event-status.
+        """
+
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "event"],
@@ -248,6 +253,7 @@ class Registration(models.Model):
         ordering = ["-registered_at"]
 
     def __str__(self):
+        """String representation."""
         return f"{self.user.username} - {self.event.title} ({self.status})"
 
     def clean(self):

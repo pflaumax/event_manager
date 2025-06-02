@@ -85,6 +85,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ["username"]  # Username required for superuser creation
 
     class Meta:
+        """
+        Sets verbose names for admin display.
+        Adds indexes for faster lookup by email and role.
+        """
+
         verbose_name = "User"
         verbose_name_plural = "Users"
         indexes = [
@@ -93,6 +98,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ]
 
     def __str__(self):
+        """String representation."""
         return f"{self.username} ({self.email}) - {self.role}"
 
     def clean(self):

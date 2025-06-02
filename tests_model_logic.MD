@@ -2,6 +2,9 @@
 
 ## User Roles
 
+- [x] **Create user with invalid or empty fields (username, mail, etc.)**  
+      Expected: Raises `ValidationError`.
+
 - [x] **Create `creator` user**  
       Expected: User is created with `role='creator'`.
 
@@ -15,6 +18,9 @@
 
 ## Event Creation
 
+- [x] **Create event with invalid or empty fields (title, location, etc.)**  
+      Expected: Raises `ValidationError`.
+      
 - [x] **Creator creates a future event**  
       Expected: Saved with `status='published'`.
 
@@ -24,17 +30,14 @@
 - [x] **Creator creates a past event with `status='completed'`**  
       Expected: Saved successfully.
 
-- [-] **Creator creates a past event with `status='published'`**  
+- [x] **Creator creates a past event with `status='published'`**  
       Expected: Status auto-updates to `completed`.
-
-- [x] **Create event with invalid or empty fields (title, location, etc.)**  
-      Expected: Raises `ValidationError`.
 
 ---
 
 ## Event Status Logic
 
-- [-] **Past event automatically marked as `completed`**  
+- [x] **Past event automatically marked as `completed`**  
       Expected: `status == 'completed'`.
 
 - [x] **Creator cancels a published event**  
@@ -59,7 +62,7 @@
 - [x] **Creator tries to register for event**  
       Expected: Raises `ValidationError`.
 
-- [x] **Visitor tries to register for cancelled or past event**  
+- [x] **Visitor tries to register for cancelled or past (completed) event**  
       Expected: Raises `ValidationError`.
 
 ---
@@ -72,5 +75,5 @@
 - [x] **Cancel registration after event date**  
       Expected: Raises `ValueError`.
 
-- [-] **Cancel someone else’s registration**  
-      Expected: Raises `PermissionError` or `ValueError`.
+- [x] **Cancel registration twice**
+      Expected: Raises `ValueError`.
