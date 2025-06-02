@@ -66,21 +66,11 @@
 
 ## Cancel Registration
 
-- [ ] **Visitor cancels their registration**  
+- [x] **Visitor cancels their registration**  
       Expected: `status='cancelled'`.
 
-- [ ] **Cancel registration after event date**  
+- [x] **Cancel registration after event date**  
       Expected: Raises `ValueError`.
 
-- [ ] **Cancel someone else’s registration**  
+- [-] **Cancel someone else’s registration**  
       Expected: Raises `PermissionError` or `ValueError`.
-
----
-
-## Attendance Marking
-
-- [ ] **Mark attendance after event is completed**  
-      Expected: `status='attended'`.
-
-- [ ] **Mark attendance before event or for non-completed event**  
-      Expected: Raises `ValueError`.

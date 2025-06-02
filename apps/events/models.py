@@ -214,7 +214,6 @@ class Registration(models.Model):
     STATUS_CHOICES = (
         ("registered", "Registered"),
         ("cancelled", "Cancelled"),
-        ("attended", "Attended"),
     )
 
     user = models.ForeignKey(
@@ -272,13 +271,6 @@ class Registration(models.Model):
             except Registration.DoesNotExist:
                 pass
 
-        # Validate attendance marking
-        if self.status == "attended":
-            if self.event.status != "completed":
-                raise ValidationError("Can only mark attendance for completed events.")
-            if not self.event.is_past:
-                raise ValidationError("Can only mark attendance for past events.")
-
     def save(self, *args, **kwargs):
         """Ensure validation is always performed before saving."""
         self.full_clean()
@@ -298,14 +290,4 @@ class Registration(models.Model):
             raise ValueError("Cannot cancel this registration.")
 
         self.status = "cancelled"
-        self.save()
-
-    def mark_attended(self):
-        """Mark registration as attended (for completed events)."""
-        if self.status != "registered":
-            raise ValueError("Can only mark attended for active registrations.")
-        if not self.event.is_past or self.event.status != "completed":
-            raise ValueError("Can only mark attendance for completed events.")
-
-        self.status = "attended"
         self.save()
