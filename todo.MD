@@ -25,11 +25,11 @@ Build a basic Django web application where users can:
 ## Database and Models
 
 - [x] Create `users` app with a custom user model (email-based login)
-- [ ] Create `events` app:
+- [x] Create `events` app:
     - [x] `Event` model (title, description, date, location, created_by)
     - [x] `Registration` model (user, event, timestamp)
 - [x] Run migrations
-- [ ] Add initial data via fixtures or admin panel
+- [x] Add initial data via fixtures or admin panel
 
 ---
 

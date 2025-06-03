@@ -208,7 +208,7 @@ class Event(models.Model):
         return self.status == "published"
 
 
-class Registration(models.Model):
+class EventRegistration(models.Model):
     """Model representing user registration for an event."""
 
     STATUS_CHOICES = (
@@ -269,12 +269,12 @@ class Registration(models.Model):
         # Validate cancellation
         if self.status == "cancelled" and self.pk:
             try:
-                original = Registration.objects.get(pk=self.pk)
+                original = EventRegistration.objects.get(pk=self.pk)
                 if original.status != "registered":
                     raise ValidationError("Can only cancel active registrations.")
                 if not original.can_cancel():
                     raise ValidationError("Cannot cancel this registration.")
-            except Registration.DoesNotExist:
+            except EventRegistration.DoesNotExist:
                 pass
 
     def save(self, *args, **kwargs):

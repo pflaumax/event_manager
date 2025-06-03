@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .models import CustomUser
+from .forms import UserForm
 
-# Create your views here.
+
+def signup(request):
+    """User registration page."""
+    return render(request, "users/signup.html")

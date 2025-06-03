@@ -94,3 +94,4 @@ data/postgres/
 settings_config.py
 mail.html
 ref.py
+structure.txt
