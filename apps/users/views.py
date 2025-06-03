@@ -6,3 +6,8 @@ from .forms import UserForm
 def signup(request):
     """User registration page."""
     return render(request, "users/signup.html")
+
+
+def login(request):
+    """User registration page."""
+    return render(request, "users/login.html")
