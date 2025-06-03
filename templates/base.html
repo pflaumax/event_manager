@@ -1,1 +1,6 @@
-<p>Text from HOME html</p>
+<p>Text from BASE html</p>
+<p>
+    <a href="{% url 'home' %}">Home</a>
+</p>
+
+{% block content %}{% endblock content %}

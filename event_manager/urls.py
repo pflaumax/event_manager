@@ -4,9 +4,9 @@ from . import views
 import debug_toolbar
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     path("__debug__/", include(debug_toolbar.urls)),
+    path("admin/", admin.site.urls),
     path("", include("apps.users.urls")),
-    # Home page
+    path("", views.home, name="home"),
     path("home/", views.home, name="home"),
 ]
