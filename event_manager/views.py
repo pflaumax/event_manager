@@ -13,5 +13,6 @@ def index(request):
 @login_required
 def home(request):
     """Home page shows events only for logged-in users"""
-    events = Event.objects.filter(status="published")
-    return render(request, "home.html", {"events": events})
+    events = Event.objects.order_by("updated_at")
+    context = {"events": events}
+    return render(request, "home.html", context)

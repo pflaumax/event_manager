@@ -10,4 +10,5 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("home/", views.home, name="home"),
     path("user/", include("apps.users.urls")),
+    path("event/", include("apps.events.urls")),
 ]

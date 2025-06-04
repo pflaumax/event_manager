@@ -17,8 +17,16 @@
 {% endif %}
 
 <p>home page, here events available for log in users</p>
-<h4>Event1</h4>
-<h4>Event2</h4>
-<h4>Event3</h4>
+<h4>Events:</h4>
+<ul>
+  {% for event in events %}
+    <li>
+      <a href="{% url 'events:event_details' event.id %}">{{ event.title }}</a>
+    </li>
+  {% empty %}
+    <li>No events have been added yet.</li>
+  {% endfor %}
+</ul>
+
 <p> REGISTER FOR EVENT</p>
 {% endblock content %}

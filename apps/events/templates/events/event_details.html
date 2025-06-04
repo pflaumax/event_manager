@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{{ event.title }}</h2>
+
+  <p>Description: {{ event.description }}</p>
+  <p>Location: {{ event.location }}</p>
+  <p>Date: {{ event.date }}</p>
+  <p>Start time: {{ event.start_time }}</p>
+  <p>Status: {{ event.get_status_display }}</p>
+  <p>Created by: {{ event.created_by.username }}</p>
+  <p>Created at: {{ event.created_at }}</p>
+
+  
+  <button name="submit">Registration for event</button>
+
+{% endblock content%}
