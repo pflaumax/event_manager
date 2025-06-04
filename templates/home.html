@@ -1,7 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>home page, here events available for log in users</p>
-<h1>Available Events</h1>
+<p>
+    {% if user.is_authenticated %}
+     Hello, {{ user.username }}
+    {% else %}
+    {% endif %}
+</p>
 
+{% if user.is_authenticated %}
+    <hr />
+    <form action="{% url 'users:logout' %}" method="post">
+        {% csrf_token %}
+        <button name="submit">Log out</button>
+    </form>
+{% endif %}
+
+<p>home page, here events available for log in users</p>
+<h4>Event1</h4>
+<h4>Event2</h4>
+<h4>Event3</h4>
+<p> REGISTER FOR EVENT</p>
 {% endblock content %}

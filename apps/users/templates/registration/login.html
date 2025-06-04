@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<p>Use your email to easily sign in to your account</p>
+{% if form.errors %}
+  <p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+<form action="{% url 'users:login' %}" method="post">
+  {% csrf_token %}
+  {{ form.as_div }}
+
+  <button name="submit">Log in</button>
+</form>
+
+{% endblock content %}

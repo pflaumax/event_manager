@@ -1,7 +1,17 @@
-<h1>Event Manager</h1>
+{% extends 'base.html' %}
+{% block content %}
 
-<p>This is some info about the website.</p>
+<h4>This is some info about the website.</h4>
 
-<a href="{% url 'signup' %}">Sign up</a>
 
-<a href="{% url 'login' %}">Log in</a>
+<a href="{% url 'users:login' %}">Log in</a>
+<br>
+<a href="{% url 'users:login' %}">rename for SIGN UP</a>
+<br>
+<a href="{% url 'users:login' %}">Get started</a>
+
+
+<p>More special info</p>
+
+
+{% endblock content %}
