@@ -17,6 +17,9 @@
 {% endif %}
 
 <p>home page, here events available for log in users</p>
+
+<a href="{% url 'events:new_event' %}">Add a new event</a>
+
 <h4>Events:</h4>
 <ul>
   {% for event in events %}
@@ -27,6 +30,18 @@
     <li>No events have been added yet.</li>
   {% endfor %}
 </ul>
+{% if form.errors %}
+  <ul class="errorlist">
+    {% for field in form %}
+      {% for error in field.errors %}
+        <li>{{ field.label }}: {{ error }}</li>
+      {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
 
 <p> REGISTER FOR EVENT</p>
 {% endblock content %}
