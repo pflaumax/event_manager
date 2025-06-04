@@ -2,7 +2,9 @@
 
 {% block content %}
 
-  <form action="{% url 'signup' %}" method="post">
+<h2>Sign up</h2>
+
+<form action="{% url 'users:signup' %}" method="post">
   {% csrf_token %}
   {{ form.as_div }}
 

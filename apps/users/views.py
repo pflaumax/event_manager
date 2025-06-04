@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
+from .forms import CustomUserSignupForm
+
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -7,10 +9,10 @@ def signup(request):
     """Register a new user."""
     if request.method != "POST":
         # Display blank registration form
-        form = UserCreationForm()
+        form = CustomUserSignupForm()
     else:
         # Process completed form
-        form = UserCreationForm(data=request.POST)
+        form = CustomUserSignupForm(data=request.POST)
 
         if form.is_valid():
             new_user = form.save()
@@ -20,4 +22,4 @@ def signup(request):
 
     # Display a blank or invalid form
     context = {"form": form}
-    return render(request, "users/signup.html", context)
+    return render(request, "registration/signup.html", context)
