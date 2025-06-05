@@ -25,7 +25,7 @@
 
 
 {% if user.is_authenticated and user.is_visitor %}
-  <button name="submit">Browse events</button>
+  <a href="{% url 'events:browse_events' %}" class="btn btn-primary">Browse events</a>
   <button name="submit">My registrations</button>
 {% endif %}
 

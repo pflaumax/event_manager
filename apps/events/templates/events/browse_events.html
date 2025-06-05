@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="get">
+<label for="status">Search by status:</label>
+<select name="status" id="status" onchange="this.form.submit()">
+    <option value="published" {% if status == "published" %}selected{% endif %}>Published</option>
+    <option value="completed" {% if status == "completed" %}selected{% endif %}>Completed</option>
+    <option value="cancelled" {% if status == "cancelled" %}selected{% endif %}>Cancelled</option>
+</select>
+</form>
+
+
+{% if events %}
+<ul>
+    {% for event in events %}
+    <li>
+        <a href="{% url 'events:event_details' event.id %}">{{ event.title }}</a>
+        - {{ event.date }} {{ event.start_time }}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No events available at the moment.</p>
+{% endif %}
+
+{% endblock content %}

@@ -6,7 +6,7 @@
   <ul>
     {% for event in events %}
       <li>
-        <a href="{% url 'events:event_details' event.id %}">{{ event.title }}</a> — {{ event.date }}
+        <a href="{% url 'events:event_details' event.id %}">{{ event.title }}</a>
       </li>
     {% endfor %}
   </ul>

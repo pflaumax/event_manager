@@ -45,8 +45,22 @@ def event_details(request, event_id):
     """Show a single event and all its information"""
     event = get_object_or_404(Event, id=event_id)
 
-    if request.user != event.created_by:
-        raise Http404("Thats not yours event")
+    if request.user.is_creator and event.created_by != request.user:
+        raise Http404("You are not allowed to view this event.")
 
     context = {"event": event}
     return render(request, "events/event_details.html", context)
+
+
+@login_required
+def browse_events(request):
+    status = request.GET.get("status", "published")
+    events = Event.objects.filter(status=status).order_by("date", "start_time")
+    return render(
+        request,
+        "events/browse_events.html",
+        {
+            "events": events,
+            "status": status,
+        },
+    )
