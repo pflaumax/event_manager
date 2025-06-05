@@ -95,3 +95,6 @@ settings_config.py
 mail.html
 ref.py
 structure.txt
+c_login.html
+c_profile.html
+c_signup.html

@@ -9,6 +9,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.index, name="index"),
     path("home/", views.home, name="home"),
-    path("user/", include("apps.users.urls")),
-    path("event/", include("apps.events.urls")),
+    path("users/", include("apps.users.urls")),
+    path("", include("apps.events.urls")),
 ]

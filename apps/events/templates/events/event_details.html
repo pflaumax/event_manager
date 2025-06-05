@@ -5,10 +5,10 @@
 
   <p>Description: {{ event.description }}</p>
   <p>Location: {{ event.location }}</p>
-  <p>Date: {{ event.date }}</p>
-  <p>Start time: {{ event.start_time }}</p>
+  <p>Date: {{ event.date|date:"d.m.Y" }}</p>
+  <p>Start time: {{ event.start_time|time:"H:i" }}</p>
   <p>Status: {{ event.get_status_display }}</p>
-  <p>Created at: {{ event.created_at }}</p>
+  <p>Event created: {{ event.created_at|date:"d.m.Y" }}</p>
 
   {% if user.is_authenticated and not user.is_creator %}
     <button name="submit">Registration for event</button>

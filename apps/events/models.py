@@ -42,23 +42,19 @@ class Event(models.Model):
         max_length=1000,
         blank=False,
         null=False,
-        help_text="Detailed description of the event.",
     )
     location = models.CharField(
         max_length=200,
         blank=False,
         null=False,
-        help_text="Event venue or address.",
     )
     date = models.DateField(
         blank=False,
         null=False,
-        help_text="Enter the date in YYYY-MM-DD format.",
     )
     start_time = models.TimeField(
         blank=False,
         null=False,
-        help_text="Enter the time in HH:MM format 24-hour.",
     )
     status = models.CharField(
         max_length=10,

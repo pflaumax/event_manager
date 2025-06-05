@@ -4,6 +4,7 @@ from .models import Event
 
 
 class EventForm(forms.ModelForm):
+
     class Meta:
         model = Event
         fields = [
@@ -15,6 +16,15 @@ class EventForm(forms.ModelForm):
         ]
 
         widgets = {
+            "title": forms.TextInput(
+                attrs={"placeholder": "Must be at least 3 characters long"}
+            ),
+            "description": forms.Textarea(
+                attrs={"placeholder": "Detailed description of the event"}
+            ),
+            "location": forms.TextInput(
+                attrs={"placeholder": "Event venue or address"}
+            ),
             "date": forms.DateInput(attrs={"placeholder": "YYYY-MM-DD"}),
             "start_time": forms.TimeInput(attrs={"placeholder": "HH:MM"}),
         }
@@ -22,9 +32,3 @@ class EventForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)  # get user from view
         super().__init__(*args, **kwargs)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if self.user and not self.user.is_creator:
-            raise ValidationError("Only users with role 'creator' can create events.")
-        return cleaned_data

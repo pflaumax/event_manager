@@ -16,3 +16,7 @@ def home(request):
     events = Event.objects.order_by("updated_at")
     context = {"events": events}
     return render(request, "home.html", context)
+
+
+def error_404(request, exception):
+    return render(request, "404.html", status=404)

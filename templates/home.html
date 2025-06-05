@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>
-    {% if user.is_authenticated %}
-     Hello, {{ user.username }}
-    {% else %}
-    {% endif %}
-</p>
+
+{% if user.is_authenticated %}
+  Hello, {{ user.username }}
+{% else %}
+{% endif %}
+
 
 {% if user.is_authenticated %}
     <hr />
@@ -17,23 +17,19 @@
 {% endif %}
 
 <h2>Welcome to the home page!</h2> 
-<h3>Here events available to view and registration for visitors</h3>
-<h3>New event create available for creators.</h3>
 
 {% if user.is_authenticated and user.is_creator %}
-  <a href="{% url 'events:new_event' %}">Add a new event</a>
+  <a href="{% url 'events:new_event' %}" class="btn btn-primary">Add new event</a>
+  <a href="{% url 'events:my_events' %}" class="btn btn-primary">My events</a>
 {% endif %}
 
-<h4>Events:</h4>
-<ul>
-  {% for event in events %}
-    <li>
-      <a href="{% url 'events:event_details' event.id %}">{{ event.title }}</a>
-    </li>
-  {% empty %}
-    <li>No events have been added yet.</li>
-  {% endfor %}
-</ul>
+
+{% if user.is_authenticated and user.is_visitor %}
+  <button name="submit">Browse events</button>
+  <button name="submit">My registrations</button>
+{% endif %}
+
+
 {% if form.errors %}
   <ul class="errorlist">
     {% for field in form %}
