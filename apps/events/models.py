@@ -53,12 +53,12 @@ class Event(models.Model):
     date = models.DateField(
         blank=False,
         null=False,
-        help_text="Event date.",
+        help_text="Enter the date in YYYY-MM-DD format.",
     )
     start_time = models.TimeField(
         blank=False,
         null=False,
-        help_text="Event start time.",
+        help_text="Enter the time in HH:MM format 24-hour.",
     )
     status = models.CharField(
         max_length=10,
@@ -99,8 +99,8 @@ class Event(models.Model):
         super().clean()
 
         # Check creator permissions
-        if not self.created_by.is_creator:
-            raise PermissionError("Only users with role 'creator' can create events.")
+        """if not self.created_by.is_creator:
+            raise PermissionError("Only users with role 'creator' can create events.")"""
 
         # Clean and validate text fields
         for field in ["title", "description", "location"]:

@@ -35,18 +35,19 @@ Build a basic Django web application where users can:
 
 ## User Authentication
 
-- [ ] Implement Django authentication
-- [ ] Add registration, login, logout functionality
-- [ ] Protect event creation for logged-in users only
+- [x] Implement Django authentication
+- [x] Add registration, login, logout functionality
+- [x] Protect event creation for logged-in creators only
 
 ---
 
 ## Templates and Frontend
 
 - [ ] Create Django templates for:
-    - [ ] Home page (event list)
-    - [ ] Login / Register pages
-    - [ ] Create event page
+    - [x] Start page (index)
+    - [x] Home page (event list)
+    - [x] Login / Sign up pages
+    - [x] Create event page
     - [ ] My events
     - [ ] Event detail with "Join" functionality
     - [ ] Display feedback via Django messages

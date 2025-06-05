@@ -16,9 +16,13 @@
     </form>
 {% endif %}
 
-<p>home page, here events available for log in users</p>
+<h2>Welcome to the home page!</h2> 
+<h3>Here events available to view and registration for visitors</h3>
+<h3>New event create available for creators.</h3>
 
-<a href="{% url 'events:new_event' %}">Add a new event</a>
+{% if user.is_authenticated and user.is_creator %}
+  <a href="{% url 'events:new_event' %}">Add a new event</a>
+{% endif %}
 
 <h4>Events:</h4>
 <ul>
@@ -43,5 +47,4 @@
   </ul>
 {% endif %}
 
-<p> REGISTER FOR EVENT</p>
 {% endblock content %}

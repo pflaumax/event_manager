@@ -14,15 +14,18 @@ def event_details(request, event_id):
 
 @login_required
 def new_event(request):
-    """Add new event (by creator)"""
+    """Add new event (by creator only)"""
+    # Block if not creator
+    if not request.user.is_creator:
+        return redirect("home")  # or render some 'permission denied' page
+
     if request.method == "POST":
         # Data submitted; create a blank form
-        form = EventForm(request.POST)
-
+        form = EventForm(request.POST, user=request.user)
         if form.is_valid():
             event = form.save(commit=False)
             event.created_by = request.user
-            form.save()
+            event.save()
             return redirect("home")
     else:
         form = EventForm()

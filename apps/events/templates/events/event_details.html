@@ -10,7 +10,9 @@
   <p>Status: {{ event.get_status_display }}</p>
   <p>Created at: {{ event.created_at }}</p>
 
-  
-  <button name="submit">Registration for event</button>
+  {% if user.is_authenticated and not user.is_creator %}
+    <button name="submit">Registration for event</button>
+  {% endif %}
+
 
 {% endblock content%}

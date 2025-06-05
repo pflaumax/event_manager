@@ -44,15 +44,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     """Custom user model with email authentication and role-based access."""
 
     ROLE_TYPE_CHOICES = (
-        ("creator", "Event Creator"),
         ("visitor", "Visitor"),
+        ("creator", "Event Creator"),
     )
 
     email = models.EmailField(
         unique=True,
         blank=False,
         null=False,
-        help_text="Email address used for login.",
     )
 
     username = models.CharField(
@@ -63,7 +62,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         validators=[
             MinLengthValidator(3, message="Title must be at least 3 characters long.")
         ],
-        help_text="Enter your name, group name or pseudonym.",
     )
 
     role = models.CharField(
@@ -72,7 +70,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         default="visitor",
         blank=False,
         null=False,
-        help_text="User role determines permissions.",
     )
 
     is_active = models.BooleanField(default=True)
