@@ -11,7 +11,7 @@ from .forms import EventForm
 def new_event(request):
     """Create a new event - only creators allowed."""
     # Check if user can create events
-    if not request.user.is_creator:
+    if not request.user.can_create_events():
         messages.error(request, "You are not allowed to create events.")
         return redirect("home")
 
@@ -53,11 +53,7 @@ def event_details(request, event_id):
 
     # Check if visitor can register for event
     can_register, message = event.can_register(request.user)
-
-    # Check if visitor is already registered for event
-    registration = None
-    if request.user.is_authenticated:
-        registration = event.registrations.filter(user=request.user).first()
+    registration = event.registrations.filter(user=request.user).first()
 
     context = {
         "event": event,
@@ -73,10 +69,6 @@ def cancel_event(request, event_id):
     """Display confirmation page for canceling event."""
     event = get_object_or_404(Event, id=event_id)
 
-    if request.user != event.created_by:
-        messages.error(request, "You are not allowed to cancel this event.")
-        return redirect("events:event_details", event_id=event.id)
-
     if request.method == "POST":
         try:
             event.cancel_event(request.user)
@@ -84,7 +76,7 @@ def cancel_event(request, event_id):
             return redirect("events:my_events")
         except (PermissionError, ValueError) as e:
             messages.error(request, str(e))
-            return redirect("events:event_details", event_id=event.id)
+            return redirect("events:event_details", event_id=event_id)
 
     return render(request, "events/cancel_event.html", {"event": event})
 
@@ -147,13 +139,9 @@ def cancel_registration(request, event_id):
         return redirect("events:event_details", event_id=event_id)
 
     if request.method == "POST":
-        try:
-            registration.cancel_registration()
-            messages.success(request, "Registration cancelled successfully.")
-            return redirect("events:my_registrations")
-        except ValueError as e:
-            messages.error(request, str(e))
-            return redirect("events:my_registrations")
+        registration.cancel_registration()
+        messages.success(request, "Registration cancelled successfully.")
+        return redirect("events:my_registrations")
 
-    # GET: Show confirmation page
+    # Show confirmation page
     return render(request, "events/cancel_registration.html", {"event": event})

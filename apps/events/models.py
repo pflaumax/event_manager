@@ -146,7 +146,10 @@ class Event(models.Model):
             self._cancel_all_registrations()
 
     def cancel_event(self, user):
-        """Allow only the creator to cancel the event."""
+        """
+        Cancel own event. Allow only the creator to cancel.
+        Cancel all active registrations for this event.
+        """
         if self.created_by != user:
             raise PermissionError("Only the event creator can cancel this event.")
         if self.status == "cancelled":
@@ -157,6 +160,12 @@ class Event(models.Model):
         self.status = "cancelled"
         self._cancel_all_registrations()
         self.save()
+
+    def _cancel_all_registrations(self):
+        """Cancel all active registrations for cancelled event."""
+        self.registrations.filter(status="registered").update(
+            status="cancelled", updated_at=timezone.now()
+        )
 
     def can_register(self, user):
         """Check if a user can register for this event."""
@@ -177,12 +186,6 @@ class Event(models.Model):
             return False, "Already registered for this event."
 
         return True, "Can register."
-
-    def _cancel_all_registrations(self):
-        """Cancel all active registrations for this event."""
-        self.registrations.filter(status="registered").update(
-            status="cancelled", updated_at=timezone.now()
-        )
 
     @property
     def is_upcoming(self):
