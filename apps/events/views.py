@@ -132,16 +132,26 @@ def my_registrations(request):
 def cancel_registration(request, event_id):
     """Display confirmation page for canceling registration"""
     event = get_object_or_404(Event, id=event_id)
-    registration = event.registrations.filter(user=request.user).first()
+    registration = event.registrations.filter(
+        user=request.user, status="registered"
+    ).first()
 
     if not registration:
         messages.error(request, "You are not registered for this event.")
         return redirect("events:event_details", event_id=event_id)
 
     if request.method == "POST":
-        registration.cancel_registration()
-        messages.success(request, "Registration cancelled successfully.")
+        try:
+            registration.cancel_registration()
+            messages.success(request, "Registration cancelled successfully.")
+            return redirect("events:my_registrations")
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect("events:my_registrations")
+
+    # GET: check if can show confirmation page
+    if not registration.can_cancel():
+        messages.error(request, f"Cannot cancel registration.")
         return redirect("events:my_registrations")
 
-    # Show confirmation page
     return render(request, "events/cancel_registration.html", {"event": event})
