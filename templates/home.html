@@ -3,28 +3,34 @@
 {% block content %}
 
 {% if user.is_authenticated %}
-  Hello, {{ user.username }}
+  <h3>{{ user.username }}</h3>
+  <p>{{ user.get_role_display }}</p>
 {% else %}
 {% endif %}
 
-
-
-
-<h2>Welcome to the home page!</h2> 
+<h3>Welcome to the home page!</h3> 
 
 {% if user.is_authenticated and user.is_creator %}
   <a href="{% url 'events:new_event' %}" class="btn btn-primary"><button>Add new event</button></a>
   <a href="{% url 'events:my_events' %}" class="btn btn-primary"><button>My events</button></a>
-{% endif %}
 
-
-{% if user.is_authenticated and user.is_visitor %}
+{% else %}
   <a href="{% url 'events:browse_events' %}" class="btn btn-primary"><button>Browse events</button></a>
   <a href="{% url 'events:my_registrations' %}">
         <button>My registrations</button>
-    </a>
+  </a>
 {% endif %}
 
+
+<p>Email Address: {{ user.email }}</p>
+<p>Account Role: {{ user.role_display }} 
+  {% if user.is_creator %} 
+    Can create and manage own events. 
+  {% else %} 
+    Can browse and register for events.</p> 
+  {% endif %}
+
+<p>Member Since: {{ user.date_joined|date:"F d, Y" }}</p>
 
 {% if form.errors %}
   <ul class="errorlist">
