@@ -12,4 +12,15 @@ urlpatterns = [
     path("my_events/<int:event_id>/", views.event_details, name="event_details"),
     # Page for viewing all events (visitor only)
     path("browse_events/", views.browse_events, name="browse_events"),
+    path(
+        "events/<int:event_id>/register/",
+        views.register_for_event,
+        name="register_for_event",
+    ),
+    path(
+        "events/<int:event_id>/cancel_registration/",
+        views.cancel_registration,
+        name="cancel_registration",
+    ),
+    path("my_registrations/", views.my_registrations, name="my_registrations"),
 ]

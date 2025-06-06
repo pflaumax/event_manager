@@ -2,6 +2,8 @@
 
 {% block content %}
   <h2>{{ event.title }}</h2>
+  <p>{{ event.description }}</p>
+  <p>Status: {{ event.get_status_display }}</p>
 
   <p>Description: {{ event.description }}</p>
   <p>Location: {{ event.location }}</p>
@@ -10,9 +12,26 @@
   <p>Status: {{ event.get_status_display }}</p>
   <p>Event created: {{ event.created_at|date:"d.m.Y" }}</p>
 
-  {% if user.is_authenticated and not user.is_creator %}
-    <button name="submit">Registration for event</button>
-  {% endif %}
+{% if user.is_visitor %}
+    {% if can_register %}
+        {% if registration %}
+            {% if registration.can_cancel %}
+                <form action="{% url 'events:cancel_registration' event.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Cancel Registration</button>
+                </form>
+            {% else %}
+                <p>You cannot cancel your registration anymore.</p>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'events:register_for_event' event.id %}">
+                <button type="button">Register for event</button>
+            </a>
+        {% endif %}
+    {% else %}
+        <p>{{ register_message }}</p>
+    {% endif %}
+{% endif %}
 
 
 {% endblock content%}

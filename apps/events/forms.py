@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django import forms
 from .models import Event
+from .models import EventRegistration
 
 
 class EventForm(forms.ModelForm):

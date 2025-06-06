@@ -19,14 +19,16 @@
 <h2>Welcome to the home page!</h2> 
 
 {% if user.is_authenticated and user.is_creator %}
-  <a href="{% url 'events:new_event' %}" class="btn btn-primary">Add new event</a>
-  <a href="{% url 'events:my_events' %}" class="btn btn-primary">My events</a>
+  <a href="{% url 'events:new_event' %}" class="btn btn-primary"><button>Add new event</button></a>
+  <a href="{% url 'events:my_events' %}" class="btn btn-primary"><button>My events</button></a>
 {% endif %}
 
 
 {% if user.is_authenticated and user.is_visitor %}
-  <a href="{% url 'events:browse_events' %}" class="btn btn-primary">Browse events</a>
-  <button name="submit">My registrations</button>
+  <a href="{% url 'events:browse_events' %}" class="btn btn-primary"><button>Browse events</button></a>
+  <a href="{% url 'events:my_registrations' %}">
+        <button>My registrations</button>
+    </a>
 {% endif %}
 
 

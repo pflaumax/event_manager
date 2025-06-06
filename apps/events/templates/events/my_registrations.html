@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Event Registrations</h2>
+
+{% if registrations %}
+    <ul>
+    {% for reg in registrations %}
+        <li>
+            <a href="{% url 'events:event_details' reg.event.id %}">{{ reg.event.title }}</a>
+
+            {% if reg.can_cancel %}
+                <form action="{% url 'events:cancel_registration' reg.event.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Cancel Registration</button>
+                </form>
+            {% else %}
+                <span>Cannot cancel registration</span>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no registrations yet.</p>
+{% endif %}
+
+{% endblock content %}
