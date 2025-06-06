@@ -11,6 +11,14 @@
   <p>Status: {{ event.get_status_display }}</p>
   <p>Event created: {{ event.created_at|date:"d.m.Y" }}</p>
 
+{% if user == event.created_by and event.can_be_cancelled %}
+<a href="{% url 'events:cancel_event' event.id %}">
+    <button type="button">Cancel Event</button>
+</a>
+{% endif %}
+
+
+
 {% if user.is_visitor %}
     {% if can_register %}
         {% if registration %}

@@ -55,15 +55,15 @@ Build a basic Django web application where users can:
     - [x] Login / Sign up pages
     - [x] Home page: create event, my own events, browse events, my registrations
 
-    - [x] Create new event page (creator )
-    - [x] My own events (creator )
-    - [ ] Cancel crated own event (creator)
+    - [x] Create new event page (creator)
+    - [x] My own events (creator)
+    - [x] Cancel my own created event (creator)
 
     - [x] Browse events (visitor)
     - [x] Event details with registration or its status (visitor)
     - [x] My registrations for events with cancel function (visitor)
-    
-    - [ ] Display feedback via Django messages
+
+    - [x] Display feedback via Django messages
 
 ---
 

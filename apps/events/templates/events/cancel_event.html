@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Confirm Event Cancellation</h2>
+  <p>Are you sure you want to cancel the event: <strong>{{ event.title }}</strong>?</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, Cancel Event</button>
+    <a href="{% url 'events:event_details' event.id %}">No, go back</a>
+  </form>
+{% endblock %}

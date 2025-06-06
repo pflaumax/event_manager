@@ -155,6 +155,7 @@ class Event(models.Model):
             raise ValueError("Only published events can be cancelled.")
 
         self.status = "cancelled"
+        self._cancel_all_registrations()
         self.save()
 
     def can_register(self, user):

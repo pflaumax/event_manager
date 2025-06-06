@@ -69,6 +69,27 @@ def event_details(request, event_id):
 
 
 @login_required
+def cancel_event(request, event_id):
+    """Display confirmation page for canceling event."""
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.user != event.created_by:
+        messages.error(request, "You are not allowed to cancel this event.")
+        return redirect("events:event_details", event_id=event.id)
+
+    if request.method == "POST":
+        try:
+            event.cancel_event(request.user)
+            messages.success(request, "Event cancelled successfully.")
+            return redirect("events:my_events")
+        except (PermissionError, ValueError) as e:
+            messages.error(request, str(e))
+            return redirect("events:event_details", event_id=event.id)
+
+    return render(request, "events/cancel_event.html", {"event": event})
+
+
+@login_required
 def browse_events(request):
     """Browse all events with optional status filter."""
     status = request.GET.get("status", "published")
