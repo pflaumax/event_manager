@@ -1,27 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
+  <h2>Browse Events</h2>
 
-<form method="get">
-<label for="status">Search by status:</label>
-<select name="status" id="status" onchange="this.form.submit()">
-    <option value="published" {% if status == "published" %}selected{% endif %}>Published</option>
-    <option value="completed" {% if status == "completed" %}selected{% endif %}>Completed</option>
-    <option value="cancelled" {% if status == "cancelled" %}selected{% endif %}>Cancelled</option>
-</select>
-</form>
+  <!-- Filter by event status -->
+  <form method="get">
+    <label for="status">Filter by status:</label>
+    <select name="status" id="status" onchange="this.form.submit()">
+      <option value="published" {% if status == "published" %}selected{% endif %}>Published</option>
+      <option value="completed" {% if status == "completed" %}selected{% endif %}>Completed</option>
+      <option value="cancelled" {% if status == "cancelled" %}selected{% endif %}>Cancelled</option>
+    </select>
+  </form>
 
+  <hr>
 
-{% if events %}
-<ul>
-    {% for event in events %}
-    <li>
-        <a href="{% url 'events:event_details' event.id %}">{{ event.title }}</a>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No events available at the moment.</p>
-{% endif %}
-
-{% endblock content %}
+  {% if events %}
+    <ul>
+      {% for event in events %}
+        <li>
+          <a href="{% url 'events:event_details' event.id %}">
+            {{ event.title }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No events available for selected status.</p>
+  {% endif %}
+{% endblock %}

@@ -1,10 +1,9 @@
-from django.core.exceptions import ValidationError
 from django import forms
 from .models import Event
-from .models import EventRegistration
 
 
 class EventForm(forms.ModelForm):
+    """A form for creating or editing events."""
 
     class Meta:
         model = Event
@@ -31,5 +30,10 @@ class EventForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop("user", None)  # get user from view
+        """
+        Initializes the form and optionally stores the user
+        passed in from the view for use in validation.
+        """
+
+        self.user = kwargs.pop("user", None)  # Get user from view
         super().__init__(*args, **kwargs)

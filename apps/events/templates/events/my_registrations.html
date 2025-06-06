@@ -10,10 +10,9 @@
             <a href="{% url 'events:event_details' reg.event.id %}">{{ reg.event.title }}</a>
 
             {% if reg.can_cancel %}
-                <form action="{% url 'events:cancel_registration' reg.event.id %}" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit">Cancel Registration</button>
-                </form>
+                <a href="{% url 'events:cancel_registration' reg.event.id %}">
+                    <button type="button">Cancel Registration</button>
+                </a>
             {% else %}
                 <span>Cannot cancel registration</span>
             {% endif %}

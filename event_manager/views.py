@@ -4,7 +4,7 @@ from apps.events.models import Event
 
 
 def index(request):
-    """Start page."""
+    """Welcome page."""
     if request.user.is_authenticated:
         return redirect("home")
     return render(request, "index.html")
@@ -14,8 +14,7 @@ def index(request):
 def home(request):
     """Home page shows events only for logged-in users"""
     events = Event.objects.order_by("updated_at")
-    context = {"events": events}
-    return render(request, "home.html", context)
+    return render(request, "home.html", {"events": events})
 
 
 def error_404(request, exception):

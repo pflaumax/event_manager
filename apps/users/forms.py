@@ -19,13 +19,13 @@ class CustomUserSignupForm(UserCreationForm):
             "email": forms.EmailInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Enter your email address",
+                    "placeholder": "Enter your email",
                 }
             ),
             "username": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "Enter your username or pseudonym",
+                    "placeholder": "Enter your username",
                 }
             ),
         }

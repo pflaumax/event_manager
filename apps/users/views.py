@@ -2,8 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from .forms import CustomUserSignupForm
 
-from django.contrib.auth.forms import UserCreationForm
-
 
 def signup(request):
     """Register a new user."""
