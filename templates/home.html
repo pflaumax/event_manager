@@ -8,13 +8,7 @@
 {% endif %}
 
 
-{% if user.is_authenticated %}
-    <hr />
-    <form action="{% url 'users:logout' %}" method="post">
-        {% csrf_token %}
-        <button name="submit">Log out</button>
-    </form>
-{% endif %}
+
 
 <h2>Welcome to the home page!</h2> 
 

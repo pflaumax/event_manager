@@ -1,5 +1,17 @@
 <h1>EVENT MANAGER</h1>
 
+{% if user.is_authenticated %}
+    <hr />
+     <a href="{% url 'home' %}" class="btn btn-primary"><button>Home</button></a>
+    
+    <form action="{% url 'users:logout' %}" method="post">
+        {% csrf_token %}
+        <button name="submit">Log out</button>
+    </form>
+{% endif %}
+
+
+
 {% if messages %}
     <div class="messages">
         {% for message in messages %}
