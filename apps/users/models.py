@@ -72,7 +72,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         null=False,
     )
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)  # Change after email confirm
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
 
