@@ -73,7 +73,7 @@ Build a basic Django web application where users can:
 
 - [x] Use Django console email backend
 - [x] Send email confirmation for account registration (token)
-- [ ] Send confirmation email on successful event registration 
+- [x] Send confirmation email on successful event registration 
 - [ ] Send notification email on cancelled event by creator (if registered)
 
 ---

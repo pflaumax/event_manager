@@ -99,3 +99,5 @@ c_login.html
 c_profile.html
 c_signup.html
 tmp/
+c_registration_email.html
+c_cancellation_email.html

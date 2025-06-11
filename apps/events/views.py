@@ -4,6 +4,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Event, EventRegistration
 from .forms import EventForm
+from apps.users.views import (
+    send_event_registration_email,
+    send_event_cancellation_emails,
+)
 
 
 @login_required
@@ -70,7 +74,16 @@ def cancel_event(request, event_id):
 
     if request.method == "POST":
         try:
+            # Get all registered users before canceling the event
+            registrations = event.registrations.filter(status="registered")
+
+            # Cancel the event
             event.cancel_event(request.user)
+
+            # Send cancellation emails to all registered users
+            if registrations:
+                send_event_cancellation_emails(request, event, registrations)
+
             messages.success(request, "Event cancelled successfully.")
             return redirect("events:my_events")
         except (PermissionError, ValueError) as e:
@@ -103,9 +116,16 @@ def register_for_event(request, event_id):
 
     if request.method == "POST":
         # Create registration
-        EventRegistration.objects.create(
+        registration = EventRegistration.objects.create(
             event=event, user=request.user, status="registered"
         )
+
+        # Send confirmation email to the user
+        try:
+            send_event_registration_email(request, registration)
+        except Exception as e:
+            # If email fails, log it but don't break the registration
+            print(f"Failed to send registration email: {e}")
         messages.success(request, "Successfully registered!")
         return redirect("events:event_details", event_id=event_id)
 
