@@ -43,6 +43,11 @@ class Event(models.Model):
         blank=False,
         null=False,
     )
+    image = models.ImageField(
+        upload_to="event_images/",
+        blank=True,
+        null=True,
+    )
     location = models.CharField(
         max_length=200,
         blank=False,

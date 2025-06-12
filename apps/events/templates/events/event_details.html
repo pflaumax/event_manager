@@ -2,6 +2,9 @@
 
 {% block content %}
   <h2>{{ event.title }}</h2>
+  {% if event.image %}
+    <img src="{{ event.image.url }}" alt="Event image" style="max-width: 300px; margin-bottom: 15px;">
+  {% endif %}
   <h3>{{ event.description }}</h3>
   <h4>Status: {{ event.get_status_display }}</h4>
 

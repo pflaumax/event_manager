@@ -1,6 +1,7 @@
 from django.http import Http404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Event, EventRegistration
 from .forms import EventForm
@@ -19,7 +20,7 @@ def new_event(request):
         return redirect("home")
 
     if request.method == "POST":
-        form = EventForm(request.POST, user=request.user)
+        form = EventForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             # Save event and set creator
             event = form.save(commit=False)
@@ -99,9 +100,21 @@ def cancel_event(request, event_id):
 def browse_events(request):
     """Browse all events with optional status filter."""
     status = request.GET.get("status", "published")
+    search_query = request.GET.get("q", "")
+    event_date = request.GET.get("date", "")
     events = Event.objects.filter(status=status).order_by("date", "start_time")
 
-    context = {"events": events, "status": status}
+    if search_query:
+        events = events.filter(Q(title__icontains=search_query))
+    if event_date:
+        events = events.filter(date=event_date)
+
+    context = {
+        "events": events,
+        "status": status,
+        "search_query": search_query,
+        "event_date": event_date,
+    }
     return render(request, "events/browse_events.html", context)
 
 
