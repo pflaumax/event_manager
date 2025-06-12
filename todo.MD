@@ -77,12 +77,13 @@ Build a basic Django web application where users can:
 
 ## Post-MVP Goals (Priority check)
 
-- [ ] Event filtering and search
-- [ ] Event image upload
+- [x] Event filtering and search
+- [x] Event image upload
 - [ ] Add edit feature for events 
 - [ ] Export registrations as CSV
 - [ ] Unit tests (2-3)
 - [ ] Implement API payment gateway (PayPal)
 - [ ] Add Docker support (Dockerfile + docker-compose)
 - [ ] Add responsive frontend design (bootstrap/tailwind)
+- [ ] Set image upload into production (railway + whitenoise/staticfiles)
 - [ ] Deploy to production with Docker and Postgres
