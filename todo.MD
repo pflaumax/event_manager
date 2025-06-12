@@ -65,8 +65,6 @@ Build a basic Django web application where users can:
 
     - [x] Display feedback via Django messages
 
-    - [ ] ??? Add editing for events
-
 ---
 
 ## Email Notifications
@@ -77,27 +75,14 @@ Build a basic Django web application where users can:
 - [x] Send notification emails for all registered visitors on cancelled event by creator
 ---
 
-## Post-MVP Goals
+## Post-MVP Goals (Priority check)
 
-- [ ] Add Docker support (Dockerfile + docker-compose)
-- [ ] Event image upload
 - [ ] Event filtering and search
-- [ ] Payment gateway (PayPal)
-- [ ] Deploy to production
-
----
-
-## Optional Enhancements
-
-- [ ] Create REST API using Django REST Framework
-- [ ] Add responsive frontend design
+- [ ] Event image upload
+- [ ] Add edit feature for events 
 - [ ] Export registrations as CSV
-
----
-
-## Deployment Plan
-
-1. Local deployment using PostgreSQL
-2. Dockerize application
-3. Deploy to a hosting platform
-
+- [ ] Unit tests (2-3)
+- [ ] Implement API payment gateway (PayPal)
+- [ ] Add Docker support (Dockerfile + docker-compose)
+- [ ] Add responsive frontend design (bootstrap/tailwind)
+- [ ] Deploy to production with Docker and Postgres
