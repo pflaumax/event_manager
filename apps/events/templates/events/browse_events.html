@@ -3,7 +3,19 @@
 {% block content %}
   <h2>Browse Events</h2>
 
-  <!-- Filter by event status -->
+  <form method="get" style="margin-top: 1em;">
+    <input type="hidden" name="status" value="{{ status }}">
+
+    <label for="q">Search by name:</label>
+    <input type="text" id="q" name="q" value="{{ search_query }}" placeholder="Event title...">
+    <br/>
+    <label for="date">Filter by date:</label>
+    <input type="date" id="date" name="date" value="{{ event_date }}">
+
+    <button type="submit">Search</button>
+    <a href="{% url 'events:browse_events' %}">Reset Filters</a>
+  </form>
+
   <form method="get">
     <label for="status">Filter by status:</label>
     <select name="status" id="status" onchange="this.form.submit()">
