@@ -65,7 +65,7 @@ Build a basic Django web application where users can:
 
     - [x] Display feedback via Django messages
 
-    - [ ] ??? Editing entries
+    - [ ] ??? Add editing for events
 
 ---
 
@@ -74,8 +74,7 @@ Build a basic Django web application where users can:
 - [x] Use Django console email backend
 - [x] Send email confirmation for account registration (token)
 - [x] Send confirmation email on successful event registration 
-- [ ] Send notification email on cancelled event by creator (if registered)
-
+- [x] Send notification emails for all registered visitors on cancelled event by creator
 ---
 
 ## Post-MVP Goals

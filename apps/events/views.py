@@ -74,14 +74,16 @@ def cancel_event(request, event_id):
 
     if request.method == "POST":
         try:
-            # Get all registered users before canceling the event
-            registrations = event.registrations.filter(status="registered")
-
+            # Freeze QuerySet to avoid changes after event cancellation
+            registrations = list(event.registrations.filter(status="registered"))
+            print("All registrations before cancelling:", registrations)
+            print("Count:", len(registrations))
             # Cancel the event
             event.cancel_event(request.user)
 
             # Send cancellation emails to all registered users
             if registrations:
+                print("Sending cancellation emails...")  # Debug
                 send_event_cancellation_emails(request, event, registrations)
 
             messages.success(request, "Event cancelled successfully.")
