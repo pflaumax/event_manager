@@ -36,6 +36,31 @@ def new_event(request):
 
 
 @login_required
+def edit_event(request, event_id):
+    """Edit event details by current creator."""
+    event = get_object_or_404(Event, id=event_id)
+
+    if not request.user.is_creator and event.created_by != request.user:
+        raise Http404("You are not allowed to edit this event.")
+
+    if request.method == "POST":
+        form = EventForm(request.POST, request.FILES, instance=event, user=request.user)
+        if form.is_valid():
+            # Save edited event
+            event.save()
+            messages.success(request, "Event edited successfully.")
+            return redirect("events:my_events")
+    else:
+        # Show empty form for GET request
+        form = EventForm(instance=event, user=request.user)
+    context = {
+        "form": form,
+        "event": event,
+    }
+    return render(request, "events/edit_event.html", context)
+
+
+@login_required
 def my_events(request):
     """Show events created by current creator."""
     if not request.user.is_creator:

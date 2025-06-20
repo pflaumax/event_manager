@@ -15,6 +15,9 @@
   <p>Event created: {{ event.created_at|date:"d.m.Y" }}</p>
 
 {% if user == event.created_by and event.can_be_cancelled %}
+<a href="{% url 'events:edit_event' event.id %}">
+    <button type="button">Edit Event</button>
+</a>
 <a href="{% url 'events:cancel_event' event.id %}">
     <button type="button">Cancel Event</button>
 </a>

@@ -5,6 +5,8 @@ app_name = "events"
 urlpatterns = [
     # Page for adding new event (creator only)
     path("new_event/", views.new_event, name="new_event"),
+    # Page for editing created event (creators only)
+    path("edit_event/<int:event_id>", views.edit_event, name="edit_event"),
     # Page for viewing own created events (creator only)
     path("my_events/", views.my_events, name="my_events"),
     # Detail page for a single event
@@ -23,7 +25,7 @@ urlpatterns = [
         views.register_for_event,
         name="register_for_event",
     ),
-    # Page for view registered events (visitor only)
+    # Page for view own registered events (visitor only)
     path("my_registrations/", views.my_registrations, name="my_registrations"),
     # Page for confirm cancel registration on event (visitor only)
     path(
