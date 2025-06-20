@@ -79,8 +79,8 @@ Build a basic Django web application where users can:
 
 - [x] Event filtering and search
 - [x] Event image upload
-- [ ] Add edit feature for events 
-- [ ] Export registrations as CSV
+- [x] Add edit feature for events 
+- [x] Export registrations as CSV
 - [ ] Unit tests (2-3)
 - [ ] Implement API payment gateway (PayPal)
 - [ ] Add Docker support (Dockerfile + docker-compose)

@@ -18,6 +18,9 @@
 <a href="{% url 'events:edit_event' event.id %}">
     <button type="button">Edit Event</button>
 </a>
+<a href="{% url 'events:export_csv' event.id %}">
+    <button type="button">Export Registrations (CSV)</button>
+</a>
 <a href="{% url 'events:cancel_event' event.id %}">
     <button type="button">Cancel Event</button>
 </a>

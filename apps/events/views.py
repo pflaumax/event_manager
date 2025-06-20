@@ -1,4 +1,5 @@
-from django.http import Http404
+import csv
+from django.http import Http404, HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -36,31 +37,6 @@ def new_event(request):
 
 
 @login_required
-def edit_event(request, event_id):
-    """Edit event details by current creator."""
-    event = get_object_or_404(Event, id=event_id)
-
-    if not request.user.is_creator and event.created_by != request.user:
-        raise Http404("You are not allowed to edit this event.")
-
-    if request.method == "POST":
-        form = EventForm(request.POST, request.FILES, instance=event, user=request.user)
-        if form.is_valid():
-            # Save edited event
-            event.save()
-            messages.success(request, "Event edited successfully.")
-            return redirect("events:my_events")
-    else:
-        # Show empty form for GET request
-        form = EventForm(instance=event, user=request.user)
-    context = {
-        "form": form,
-        "event": event,
-    }
-    return render(request, "events/edit_event.html", context)
-
-
-@login_required
 def my_events(request):
     """Show events created by current creator."""
     if not request.user.is_creator:
@@ -91,6 +67,60 @@ def event_details(request, event_id):
         "registration": registration,
     }
     return render(request, "events/event_details.html", context)
+
+
+@login_required
+def edit_event(request, event_id):
+    """Edit event details by current creator."""
+    event = get_object_or_404(Event, id=event_id)
+
+    if not request.user.is_creator and event.created_by != request.user:
+        raise Http404("You are not allowed to edit this event.")
+
+    if request.method == "POST":
+        form = EventForm(request.POST, request.FILES, instance=event, user=request.user)
+        if form.is_valid():
+            # Save edited event
+            event.save()
+            messages.success(request, "Event edited successfully.")
+            return redirect("events:my_events")
+    else:
+        # Show empty form for GET request
+        form = EventForm(instance=event, user=request.user)
+    context = {
+        "form": form,
+        "event": event,
+    }
+    return render(request, "events/edit_event.html", context)
+
+
+@login_required
+def export_registrations_csv(request, event_id):
+    """Export all visitors registrations data for one event in CSV format."""
+    event = get_object_or_404(Event, id=event_id)
+
+    if not request.user.is_creator or event.created_by != request.user:
+        raise Http404("You are not allowed to export this event.")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = (
+        f'attachment; filename="event_{event_id}_registrations.csv"'
+    )
+
+    writer = csv.writer(response)
+    writer.writerow(["Username", "Email", "Registered at"])
+
+    registrations = event.registrations.select_related("user").all()
+    for registration in registrations:
+        writer.writerow(
+            [
+                registration.user.username,
+                registration.user.email,
+                registration.registered_at.strftime("%H:%M %d-%m-%Y"),
+            ]
+        )
+
+    return response
 
 
 @login_required
