@@ -259,7 +259,7 @@ class EventRegistration(models.Model):
 
     def __str__(self):
         """String representation."""
-        return f"{self.user.username} - {self.event.title} ({self.status})"
+        return f"{self.user.email} - {self.event.title}"
 
     def clean(self):
         """Perform custom validation for registration model."""

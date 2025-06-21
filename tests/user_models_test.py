@@ -30,25 +30,25 @@ class UserModelTest(TestCase):
 
     def test_user_str_representation(self):
         """Test user string representation."""
-        user = UserFactory(username="user4", email="test@example.com", role="visitor")
-        expected_str = "user4 (test@example.com) - visitor"
+        user = UserFactory(username="user27", email="test@example.com", role="visitor")
+        expected_str = "user27 (test@example.com) - visitor"
         self.assertEqual(str(user), expected_str)
 
     def test_create_user_with_empty_email(self):
         """Test that creating user with empty email raises ValidationError."""
         with self.assertRaises(ValidationError):
-            user = User(email="", username="testuser", role="visitor")
+            user = UserFactory.build(email="")
             user.full_clean()
 
     def test_create_user_with_invalid_email(self):
         """Test that creating user with invalid email raises ValidationError."""
         with self.assertRaises(ValidationError):
-            user = User(email="invalid-email", username="testuser", role="visitor")
+            user = UserFactory.build(email="invalid-email")
             user.full_clean()
 
     def test_email_uniqueness(self):
         """Test that duplicate emails are not allowed."""
         UserFactory(email="test@example.com")
         with self.assertRaises(ValidationError):
-            user = User(email="test@example.com", username="testuser2", role="visitor")
+            user = UserFactory.build(email="test@example.com", username="testuser27")
             user.full_clean()
