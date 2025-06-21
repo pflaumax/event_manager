@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils import timezone
@@ -100,8 +100,8 @@ class Event(models.Model):
         super().clean()
 
         # Check creator permissions
-        """if not self.created_by.is_creator:
-            raise PermissionError("Only users with role 'creator' can create events.")"""
+        if not self.created_by.is_creator:
+            raise PermissionDenied("Only users with role 'creator' can create events.")
 
         # Clean and validate text fields
         for field in ["title", "description", "location"]:

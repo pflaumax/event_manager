@@ -1,6 +1,7 @@
 import factory
 from django.contrib.auth import get_user_model
 from datetime import datetime, timedelta
+from django.utils import timezone
 from apps.events.models import Event, EventRegistration
 
 User = get_user_model()
@@ -31,7 +32,8 @@ class EventFactory(factory.django.DjangoModelFactory):
     description = "Test event description"
     location = "Test Location"
     date = factory.LazyFunction(lambda: datetime.now() + timedelta(days=7))
-    creator = factory.SubFactory(CreatorFactory)
+    start_time = factory.LazyFunction(lambda: timezone.now() + timedelta(days=1))
+    created_by = factory.SubFactory(CreatorFactory)
     status = "published"
 
 
