@@ -81,9 +81,12 @@ Build a basic Django web application where users can:
 - [x] Event image upload
 - [x] Add edit feature for events 
 - [x] Export registrations as CSV
-- [ ] Unit tests (2-3)
-- [ ] Implement API payment gateway (PayPal)
+- [x] Unit tests (event, registrations, users: models, views)
 - [ ] Add Docker support (Dockerfile + docker-compose)
 - [ ] Add responsive frontend design (bootstrap/tailwind)
 - [ ] Set image upload into production (railway + whitenoise/staticfiles)
 - [ ] Deploy to production with Docker and Postgres
+
+## After all: ideas to add
+
+- [ ] Implement API payment gateway (PayPal)
