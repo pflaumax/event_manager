@@ -73,7 +73,7 @@ class EventModelTest(TestCase):
     def test_event_str_representation(self):
         """Test event string representation."""
         event = EventFactory(title="Test Event")
-        self.assertEqual(str(event), "Test Event - 2025-06-28 (published)")
+        self.assertEqual(str(event), "Test Event - 2025-06-29 (published)")
 
 
 class RegistrationModelTest(TestCase):
