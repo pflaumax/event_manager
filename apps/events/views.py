@@ -1,9 +1,10 @@
 import csv
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
+from typing import Union
 from .models import Event, EventRegistration
 from .forms import EventForm
 from apps.users.views import (
@@ -13,7 +14,7 @@ from apps.users.views import (
 
 
 @login_required
-def new_event(request):
+def new_event(request: HttpRequest) -> HttpResponse:
     """Create a new event - only creators allowed."""
     # Check if user can create events
     if not request.user.can_create_events():
@@ -37,7 +38,7 @@ def new_event(request):
 
 
 @login_required
-def my_events(request):
+def my_events(request: HttpRequest) -> HttpResponse:
     """Show events created by current creator."""
     if not request.user.is_creator:
         raise Http404("You are not allowed to view this events.")
@@ -48,7 +49,9 @@ def my_events(request):
 
 
 @login_required
-def event_details(request, event_id):
+def event_details(
+    request: HttpRequest, event_id: int
+) -> Union[HttpResponseRedirect, HttpResponse]:
     """Show single event details."""
     event = get_object_or_404(Event, id=event_id)
 
@@ -70,7 +73,9 @@ def event_details(request, event_id):
 
 
 @login_required
-def edit_event(request, event_id):
+def edit_event(
+    request: HttpRequest, event_id: int
+) -> Union[HttpResponseRedirect, HttpResponse]:
     """Edit event details by current creator."""
     event = get_object_or_404(Event, id=event_id)
 
@@ -95,7 +100,9 @@ def edit_event(request, event_id):
 
 
 @login_required
-def export_registrations_csv(request, event_id):
+def export_registrations_csv(
+    request: HttpRequest, event_id: int
+) -> Union[HttpResponseRedirect, HttpResponse]:
     """Export all visitors registrations data for one event in CSV format."""
     event = get_object_or_404(Event, id=event_id)
 
@@ -124,7 +131,9 @@ def export_registrations_csv(request, event_id):
 
 
 @login_required
-def cancel_event(request, event_id):
+def cancel_event(
+    request: HttpRequest, event_id: int
+) -> Union[HttpResponseRedirect, HttpResponse]:
     """Display confirmation page for canceling event."""
     event = get_object_or_404(Event, id=event_id)
 
@@ -152,7 +161,7 @@ def cancel_event(request, event_id):
 
 
 @login_required
-def browse_events(request):
+def browse_events(request: HttpRequest) -> HttpResponse:
     """Browse all events with optional status filter."""
     status = request.GET.get("status", "published")
     search_query = request.GET.get("q", "")
@@ -174,7 +183,9 @@ def browse_events(request):
 
 
 @login_required
-def register_for_event(request, event_id):
+def register_for_event(
+    request: HttpRequest, event_id: int
+) -> Union[HttpResponseRedirect, HttpResponse]:
     """Register visitor for an event with confirmation."""
     event = get_object_or_404(Event, id=event_id)
 
@@ -204,7 +215,7 @@ def register_for_event(request, event_id):
 
 
 @login_required
-def my_registrations(request):
+def my_registrations(request: HttpRequest) -> HttpResponse:
     """Show visitor's event registrations."""
     registrations = (
         EventRegistration.objects.filter(user=request.user, status="registered")
@@ -218,7 +229,9 @@ def my_registrations(request):
 
 
 @login_required
-def cancel_registration(request, event_id):
+def cancel_registration(
+    request: HttpRequest, event_id: int
+) -> Union[HttpResponseRedirect, HttpResponse]:
     """Display confirmation page for canceling registration"""
     event = get_object_or_404(Event, id=event_id)
     registration = event.registrations.filter(

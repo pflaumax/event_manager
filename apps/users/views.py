@@ -1,6 +1,10 @@
+from typing import Optional, Iterable
+from apps.events.models import Event, EventRegistration
+from apps.users.models import CustomUser
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail, send_mass_mail
 from django.template.loader import render_to_string
@@ -14,7 +18,7 @@ from .forms import CustomUserSignupForm
 User = get_user_model()
 
 
-def signup(request):
+def signup(request: HttpRequest) -> HttpResponse:
     """
     Register a new user with email confirmation.
     GET: Display empty registration form.
@@ -46,7 +50,7 @@ def signup(request):
     return render(request, "registration/signup.html", context)
 
 
-def activate(request, uidb64, token):
+def activate(request: HttpRequest, uidb64: str, token: str) -> HttpResponseRedirect:
     """
     Activate user account when they click the confirmation link in email.
     Base64 encoded user ID. Security token for verification.
@@ -72,7 +76,7 @@ def activate(request, uidb64, token):
         return redirect("index")
 
 
-def send_activation_email(request, user):
+def send_activation_email(request: HttpRequest, user: CustomUser) -> None:
     """
     Helper function to send activation email to new user.
     HTTP request object. User object to send email to.
@@ -96,7 +100,7 @@ def send_activation_email(request, user):
     send_mail(subject, message, from_email, [user.email])
 
 
-def get_user_from_token(uidb64):
+def get_user_from_token(uidb64: str) -> Optional[User]:
     """
     Helper function to safely decode user ID from base64 token.
     idb64: Base64 encoded user. Returns user object if found, None otherwise.
@@ -111,7 +115,9 @@ def get_user_from_token(uidb64):
         return None
 
 
-def send_event_registration_email(request, registration):
+def send_event_registration_email(
+    request: HttpRequest, registration: EventRegistration
+) -> None:
     """
     Send confirmation email when user registers for an event.
     HTTP request object.
@@ -143,7 +149,9 @@ def send_event_registration_email(request, registration):
         raise
 
 
-def send_event_cancellation_emails(request, event, registrations):
+def send_event_cancellation_emails(
+    request: HttpRequest, event: Event, registrations: Iterable[EventRegistration]
+):
     """
     Send cancellation notification emails to all registered users.
     HTTP request object. Event object that was cancelled
