@@ -1,22 +1,31 @@
+from typing import Any
 from django import forms
 from .models import Event
 
 
 class EventForm(forms.ModelForm):
-    """A form for creating or editing events."""
+    """
+    A form for creating or editing events.
+    This form handles the creation and editing of Event instances,
+    with custom widgets and validation logic.
+    Attributes:
+        user: Optional User instance passed from the view for validation purposes.
+    """
 
     class Meta:
-        model = Event
-        fields = [
+        """Meta configuration for the EventForm."""
+
+        model: type[Event] = Event
+        fields: tuple[str, ...] = (
             "title",
             "image",
             "description",
             "location",
             "date",
             "start_time",
-        ]
+        )
 
-        widgets = {
+        widgets: dict[str, forms.Widget] = {
             "title": forms.TextInput(
                 attrs={"placeholder": "Must be at least 3 characters long"}
             ),
@@ -30,11 +39,13 @@ class EventForm(forms.ModelForm):
             "start_time": forms.TimeInput(attrs={"placeholder": "HH:MM"}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """
-        Initializes the form and optionally stores the user
-        passed in from the view for use in validation.
+        Initialize the form and optionally store the user passed from the view.
+        Args:
+            *args: Variable length argument list passed to parent class.
+            **kwargs: Arbitrary keyword arguments. 'user' key is extracted if present for use in validation.
         """
 
-        self.user = kwargs.pop("user", None)  # Get user from view
+        self.user = kwargs.pop("user", None)  # Extract user from kwargs
         super().__init__(*args, **kwargs)
