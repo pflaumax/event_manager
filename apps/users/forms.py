@@ -4,7 +4,16 @@ from .models import CustomUser
 
 
 class CustomUserSignupForm(UserCreationForm):
-    """Custom user registration form with role selection."""
+    """
+    Custom user registration form with role selection.
+    This form extends Django's built-in UserCreationForm to include
+    role selection functionality, allowing users to choose between
+    different user types during registration.
+
+    Attributes:
+        role: ChoiceField for selecting user role (Creator or Visitor).
+        Creator can create events, Visitor can register for events
+    """
 
     role: forms.ChoiceField = forms.ChoiceField(
         choices=CustomUser.ROLE_TYPE_CHOICES,
@@ -13,6 +22,8 @@ class CustomUserSignupForm(UserCreationForm):
     )
 
     class Meta:
+        """Meta configuration for the CustomUserSignupForm."""
+
         model: type[CustomUser] = CustomUser
         fields: tuple[str, ...] = (
             "email",
