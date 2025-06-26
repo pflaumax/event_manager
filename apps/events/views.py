@@ -1,10 +1,12 @@
 import csv
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
+from typing import Union, List, Optional, TYPE_CHECKING, cast
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, QuerySet
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from typing import Union
+
 from .models import Event, EventRegistration
 from .forms import EventForm
 from apps.users.views import (
@@ -12,12 +14,24 @@ from apps.users.views import (
     send_event_cancellation_emails,
 )
 
+if TYPE_CHECKING:
+    from apps.users.models import CustomUser
+
 
 @login_required
 def new_event(request: HttpRequest) -> HttpResponse:
-    """Create a new event - only creators allowed."""
+    """
+    Create a new event - only creators allowed.
+    Args:
+        request: The HTTP request object.
+    Returns:
+        HttpResponse: Rendered template for event creation or redirect after successful creation.
+    Raises:
+        None: Redirects with error message if user cannot create events.
+    """
     # Check if user can create events
-    if not request.user.can_create_events():
+    user = cast("CustomUser", request.user)
+    if not hasattr(user, "can_create_events") or not user.can_create_events():
         messages.error(request, "You are not allowed to create events.")
         return redirect("home")
 
@@ -32,19 +46,28 @@ def new_event(request: HttpRequest) -> HttpResponse:
             return redirect("events:my_events")
     else:
         # Show empty form for GET request
-        form = EventForm()
+        form = EventForm(user=request.user)
 
     return render(request, "events/new_event.html", {"form": form})
 
 
 @login_required
 def my_events(request: HttpRequest) -> HttpResponse:
-    """Show events created by current creator."""
-    if not request.user.is_creator:
-        raise Http404("You are not allowed to view this events.")
+    """
+    Show events created by current creator.
+    Args:
+        request: The HTTP request object.
+    Returns:
+        HttpResponse: Rendered template with user's created events.
+    Raises:
+        Http404: If user is not a creator.
+    """
+    user = cast("CustomUser", request.user)
+    if not hasattr(user, "is_creator") or not user.is_creator:
+        raise Http404("You are not allowed to view these events.")
 
     # Get user's events
-    events = Event.objects.filter(created_by=request.user)
+    events: QuerySet[Event] = Event.objects.filter(created_by=request.user)
     return render(request, "events/my_events.html", {"events": events})
 
 
@@ -52,16 +75,38 @@ def my_events(request: HttpRequest) -> HttpResponse:
 def event_details(
     request: HttpRequest, event_id: int
 ) -> Union[HttpResponseRedirect, HttpResponse]:
-    """Show single event details."""
-    event = get_object_or_404(Event, id=event_id)
+    """
+    Show single event details.
+
+    Args:
+        request: The HTTP request object.
+        event_id: The ID of the event to display.
+
+    Returns:
+        HttpResponse: Rendered template with event details.
+
+    Raises:
+        Http404: If event doesn't exist or user lacks permission to view it.
+    """
+    event: Event = get_object_or_404(Event, id=event_id)
 
     # Creators can only see their own events
-    if request.user.is_creator and event.created_by != request.user:
+    user = cast("CustomUser", request.user)
+    if (
+        hasattr(user, "is_creator")
+        and user.is_creator
+        and event.created_by != request.user
+    ):
         raise Http404("You are not allowed to view this event details.")
 
     # Check if visitor can register for event
+    can_register: bool
+    message: str
     can_register, message = event.can_register(request.user)
-    registration = event.registrations.filter(user=request.user).first()
+
+    registration: Optional[EventRegistration] = None
+    if hasattr(event, "registrations"):
+        registration = event.registrations.filter(user=request.user).first()  # type: ignore
 
     context = {
         "event": event,
@@ -76,22 +121,37 @@ def event_details(
 def edit_event(
     request: HttpRequest, event_id: int
 ) -> Union[HttpResponseRedirect, HttpResponse]:
-    """Edit event details by current creator."""
-    event = get_object_or_404(Event, id=event_id)
+    """
+    Edit event details by current creator.
+    Args:
+        request: The HTTP request object.
+        event_id: The ID of the event to edit.
+    Returns:
+        HttpResponse: Rendered template for event editing or redirect after successful edit.
+    Raises:
+        Http404: If event doesn't exist or user lacks permission to edit it.
+    """
+    event: Event = get_object_or_404(Event, id=event_id)
 
-    if not request.user.is_creator and event.created_by != request.user:
+    user = cast("CustomUser", request.user)
+    if (
+        not hasattr(user, "is_creator")
+        or not user.is_creator
+        or event.created_by != request.user
+    ):
         raise Http404("You are not allowed to edit this event.")
 
     if request.method == "POST":
         form = EventForm(request.POST, request.FILES, instance=event, user=request.user)
         if form.is_valid():
             # Save edited event
-            event.save()
+            form.save()
             messages.success(request, "Event edited successfully.")
             return redirect("events:my_events")
     else:
-        # Show empty form for GET request
+        # Show form with existing data for GET request
         form = EventForm(instance=event, user=request.user)
+
     context = {
         "form": form,
         "event": event,
@@ -103,10 +163,24 @@ def edit_event(
 def export_registrations_csv(
     request: HttpRequest, event_id: int
 ) -> Union[HttpResponseRedirect, HttpResponse]:
-    """Export all visitors registrations data for one event in CSV format."""
-    event = get_object_or_404(Event, id=event_id)
+    """
+    Export all visitor registrations data for one event in CSV format.
+    Args:
+        request: The HTTP request object.
+        event_id: The ID of the event to export registrations for.
+    Returns:
+        HttpResponse: CSV file download response.
+    Raises:
+        Http404: If event doesn't exist or user lacks permission to export.
+    """
+    event: Event = get_object_or_404(Event, id=event_id)
 
-    if not request.user.is_creator or event.created_by != request.user:
+    user = cast("CustomUser", request.user)
+    if (
+        not hasattr(user, "is_creator")
+        or not user.is_creator
+        or event.created_by != request.user
+    ):
         raise Http404("You are not allowed to export this event.")
 
     response = HttpResponse(content_type="text/csv")
@@ -117,7 +191,12 @@ def export_registrations_csv(
     writer = csv.writer(response)
     writer.writerow(["Username", "Email", "Registered at"])
 
-    registrations = event.registrations.select_related("user").all()
+    registrations: QuerySet[EventRegistration]
+    if hasattr(event, "registrations"):
+        registrations = event.registrations.select_related("user").all()  # type: ignore
+    else:
+        registrations = EventRegistration.objects.none()
+
     for registration in registrations:
         writer.writerow(
             [
@@ -134,15 +213,28 @@ def export_registrations_csv(
 def cancel_event(
     request: HttpRequest, event_id: int
 ) -> Union[HttpResponseRedirect, HttpResponse]:
-    """Display confirmation page for canceling event."""
-    event = get_object_or_404(Event, id=event_id)
+    """
+    Display confirmation page for canceling event.
+    Args:
+        request: The HTTP request object.
+        event_id: The ID of the event to cancel.
+    Returns:
+        HttpResponse: Rendered confirmation template or redirect after cancellation.
+    Raises:
+        Http404: If event doesn't exist.
+    """
+    event: Event = get_object_or_404(Event, id=event_id)
 
     if request.method == "POST":
         try:
             # Freeze QuerySet to avoid changes after event cancellation
-            registrations = list(event.registrations.filter(status="registered"))
-            print("All registrations before cancelling:", registrations)
-            print("Count:", len(registrations))
+            registrations: List[EventRegistration] = []
+            if hasattr(event, "registrations"):
+                registrations = list(event.registrations.filter(status="registered"))  # type: ignore
+
+            print(f"All registrations before cancelling: {registrations}")
+            print(f"Count: {len(registrations)}")
+
             # Cancel the event
             event.cancel_event(request.user)
 
@@ -162,11 +254,20 @@ def cancel_event(
 
 @login_required
 def browse_events(request: HttpRequest) -> HttpResponse:
-    """Browse all events with optional status filter."""
-    status = request.GET.get("status", "published")
-    search_query = request.GET.get("q", "")
-    event_date = request.GET.get("date", "")
-    events = Event.objects.filter(status=status).order_by("date", "start_time")
+    """
+    Browse all events with optional status filter.
+    Args:
+        request: The HTTP request object.
+    Returns:
+        HttpResponse: Rendered template with filtered events list.
+    """
+    status: str = request.GET.get("status", "published")
+    search_query: str = request.GET.get("q", "")
+    event_date: str = request.GET.get("date", "")
+
+    events: QuerySet[Event] = Event.objects.filter(status=status).order_by(
+        "date", "start_time"
+    )
 
     if search_query:
         events = events.filter(Q(title__icontains=search_query))
@@ -186,10 +287,21 @@ def browse_events(request: HttpRequest) -> HttpResponse:
 def register_for_event(
     request: HttpRequest, event_id: int
 ) -> Union[HttpResponseRedirect, HttpResponse]:
-    """Register visitor for an event with confirmation."""
-    event = get_object_or_404(Event, id=event_id)
+    """
+    Register visitor for an event with confirmation.
+    Args:
+        request: The HTTP request object.
+        event_id: The ID of the event to register for.
+    Returns:
+        HttpResponse: Rendered confirmation template or redirect after registration.
+    Raises:
+        Http404: If event doesn't exist.
+    """
+    event: Event = get_object_or_404(Event, id=event_id)
 
     # Check if registration is allowed
+    can_register: bool
+    message: str
     can_register, message = event.can_register(request.user)
     if not can_register:
         messages.error(request, message)
@@ -197,7 +309,7 @@ def register_for_event(
 
     if request.method == "POST":
         # Create registration
-        registration = EventRegistration.objects.create(
+        registration: EventRegistration = EventRegistration.objects.create(
             event=event, user=request.user, status="registered"
         )
 
@@ -207,6 +319,7 @@ def register_for_event(
         except Exception as e:
             # If email fails, log it but don't break the registration
             print(f"Failed to send registration email: {e}")
+
         messages.success(request, "Successfully registered!")
         return redirect("events:event_details", event_id=event_id)
 
@@ -216,8 +329,14 @@ def register_for_event(
 
 @login_required
 def my_registrations(request: HttpRequest) -> HttpResponse:
-    """Show visitor's event registrations."""
-    registrations = (
+    """
+    Show visitor's event registrations.
+    Args:
+        request: The HTTP request object.
+    Returns:
+        HttpResponse: Rendered template with user's registrations.
+    """
+    registrations: QuerySet[EventRegistration] = (
         EventRegistration.objects.filter(user=request.user, status="registered")
         .select_related("event")
         .order_by("event__date")
@@ -232,11 +351,23 @@ def my_registrations(request: HttpRequest) -> HttpResponse:
 def cancel_registration(
     request: HttpRequest, event_id: int
 ) -> Union[HttpResponseRedirect, HttpResponse]:
-    """Display confirmation page for canceling registration"""
-    event = get_object_or_404(Event, id=event_id)
-    registration = event.registrations.filter(
-        user=request.user, status="registered"
-    ).first()
+    """
+    Display confirmation page for canceling registration.
+    Args:
+        request: The HTTP request object.
+        event_id: The ID of the event to cancel registration for.
+    Returns:
+        HttpResponse: Rendered confirmation template or redirect after cancellation.
+    Raises:
+        Http404: If event doesn't exist.
+    """
+    event: Event = get_object_or_404(Event, id=event_id)
+    registration: Optional[EventRegistration] = None
+
+    if hasattr(event, "registrations"):
+        registration = event.registrations.filter(  # type: ignore
+            user=request.user, status="registered"
+        ).first()
 
     if not registration:
         messages.error(request, "You are not registered for this event.")
@@ -253,7 +384,7 @@ def cancel_registration(
 
     # GET: check if can show confirmation page
     if not registration.can_cancel():
-        messages.error(request, f"Cannot cancel registration.")
+        messages.error(request, "Cannot cancel registration.")
         return redirect("events:my_registrations")
 
     return render(request, "events/cancel_registration.html", {"event": event})
