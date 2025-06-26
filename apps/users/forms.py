@@ -6,16 +6,22 @@ from .models import CustomUser
 class CustomUserSignupForm(UserCreationForm):
     """Custom user registration form with role selection."""
 
-    role = forms.ChoiceField(
+    role: forms.ChoiceField = forms.ChoiceField(
         choices=CustomUser.ROLE_TYPE_CHOICES,
         widget=forms.Select(attrs={"class": "form-control"}),
         help_text="Select your role: Creator can create events, Visitor can register for events.",
     )
 
     class Meta:
-        model = CustomUser
-        fields = ("email", "username", "role", "password1", "password2")
-        widgets = {
+        model: type[CustomUser] = CustomUser
+        fields: tuple[str, ...] = (
+            "email",
+            "username",
+            "role",
+            "password1",
+            "password2",
+        )
+        widgets: dict[str, forms.Widget] = {
             "email": forms.EmailInput(
                 attrs={
                     "class": "form-control",
