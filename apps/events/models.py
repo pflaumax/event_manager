@@ -1,36 +1,61 @@
+from typing import Optional, Tuple, Union
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.validators import MinLengthValidator
 from django.db import models
+from django.db.models import QuerySet
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+
+# Assuming CustomUser is imported from apps.users.models
+# If not available, use AbstractUser as fallback
 from apps.users.models import CustomUser
 
 
 class EventManager(models.Manager):
-    """Custom manager for Event model."""
+    """Custom manager for Event model with type-safe query methods."""
 
-    def past(self):
-        """Return events that have already happened."""
+    def past(self) -> QuerySet["Event"]:
+        """
+        Return events that have already happened.
+        Returns:
+            QuerySet: Events with dates before today.
+        """
         return self.filter(date__lt=timezone.now().date())
 
-    def published(self):
-        """Return only published events (upcoming)."""
+    def published(self) -> QuerySet["Event"]:
+        """
+        Return only published events (upcoming).
+        Returns:
+            QuerySet: Events with 'published' status.
+        """
         return self.filter(status="published")
 
-    def filter_by_creator(self, user):
-        """Filter events by creator."""
+    def filter_by_creator(self, user) -> QuerySet["Event"]:
+        """
+        Filter events by creator.
+        Args:
+            user: The user who created the events.
+        Returns:
+            QuerySet: Events created by the specified user.
+        """
         return self.filter(created_by=user)
 
 
 class Event(models.Model):
-    """Model representing an event."""
+    """
+    Model representing an event with comprehensive validation and status management.
 
-    STATUS_CHOICES = (
+    This model handles event creation, validation, status transitions,
+    and registration management with proper permission checks.
+    """
+
+    STATUS_CHOICES: tuple[tuple[str, str], ...] = (
         ("published", "Published"),
         ("completed", "Completed"),
         ("cancelled", "Cancelled"),
     )
 
-    title = models.CharField(
+    title: models.CharField = models.CharField(
         max_length=100,
         blank=False,
         null=False,
@@ -38,50 +63,52 @@ class Event(models.Model):
             MinLengthValidator(3, message="Title must be at least 3 characters long.")
         ],
     )
-    description = models.TextField(
+    description: models.TextField = models.TextField(
         max_length=1000,
         blank=False,
         null=False,
     )
-    image = models.ImageField(
+    image: models.ImageField = models.ImageField(
         upload_to="event_images/",
         blank=True,
         null=True,
     )
-    location = models.CharField(
+    location: models.CharField = models.CharField(
         max_length=200,
         blank=False,
         null=False,
     )
-    date = models.DateField(
+    date: models.DateField = models.DateField(
         blank=False,
         null=False,
     )
-    start_time = models.TimeField(
+    start_time: models.TimeField = models.TimeField(
         blank=False,
         null=False,
     )
-    status = models.CharField(
+    status: models.CharField = models.CharField(
         max_length=10,
         blank=False,
         null=False,
         choices=STATUS_CHOICES,
         default="published",
     )
-    created_by = models.ForeignKey(
+    created_by: models.ForeignKey = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
         related_name="created_events",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: models.DateTimeField = models.DateTimeField(auto_now=True)
 
     objects = EventManager()
 
     class Meta:
         """
+        Meta configuration for Event model.
+
         Orders events by date and start time.
-        Adds indexes for faster filtering by date, status, and creator
+        Adds indexes for faster filtering by date, status, and creator.
         """
 
         ordering = ["date", "start_time"]
@@ -91,16 +118,27 @@ class Event(models.Model):
             models.Index(fields=["created_by"]),
         ]
 
-    def __str__(self):
-        """String representation."""
+    def __str__(self) -> str:
+        """
+        String representation of the event.
+        Returns:
+            str: Formatted string with title, date, and status.
+        """
         return f"{self.title} - {self.date} ({self.status})"
 
-    def clean(self):
-        """Perform custom event validation for the Event model."""
+    def clean(self) -> None:
+        """
+        Perform custom event validation for the Event model.
+        Validates: Creator permissions, Text field content
+        Date and status consistency
+        Raises:
+            PermissionDenied: If user doesn't have creator permissions.
+            ValidationError: If validation fails.
+        """
         super().clean()
 
         # Check creator permissions
-        if not self.created_by.is_creator:
+        if not hasattr(self.created_by, "is_creator") or not self.created_by.is_creator:
             raise PermissionDenied("Only users with role 'creator' can create events.")
 
         # Clean and validate text fields
@@ -132,9 +170,13 @@ class Event(models.Model):
                     }
                 )
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         """
         Override save method to enforce logic and handle event status updates.
+        Performs full validation before saving and handles status change cascades.
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
         """
         # Validate before saving
         self.full_clean()
@@ -150,11 +192,17 @@ class Event(models.Model):
         if previous_status != "cancelled" and self.status == "cancelled":
             self._cancel_all_registrations()
 
-    def cancel_event(self, user):
+    def cancel_event(self, user) -> None:
         """
         Cancel own event. Allow only the creator to cancel.
         Cancel all active registrations for this event.
+        Args:
+            user: The user attempting to cancel the event.
+        Raises:
+            PermissionError: If user is not the event creator.
+            ValueError: If event cannot be cancelled.
         """
+
         if self.created_by != user:
             raise PermissionError("Only the event creator can cancel this event.")
         if self.status == "cancelled":
@@ -166,14 +214,24 @@ class Event(models.Model):
         self._cancel_all_registrations()
         self.save()
 
-    def _cancel_all_registrations(self):
-        """Cancel all active registrations for cancelled event."""
-        self.registrations.filter(status="registered").update(
+    def _cancel_all_registrations(self) -> None:
+        """
+        Cancel all active registrations for cancelled event.
+        Private method to handle registration cancellation when event is cancelled.
+        """
+        self.registrations.filter(status="registered").update(  # type: ignore
             status="cancelled", updated_at=timezone.now()
         )
 
-    def can_register(self, user):
-        """Check if a user can register for this event."""
+    def can_register(self, user) -> Tuple[bool, str]:
+        """
+        Check if a user can register for this event.
+        Args:
+            user: The user attempting to register.
+        Returns:
+            Tuple[bool, str]: (can_register, reason) where can_register is True
+            if registration is allowed, and reason explains why.
+        """
         # Check user permissions
         if not user.is_authenticated:
             return False, "User must be logged in to register."
@@ -187,60 +245,83 @@ class Event(models.Model):
             return False, "Event is not available for registration."
 
         # Check existing registration
-        if self.registrations.filter(user=user, status="registered").exists():
+        if self.registrations.filter(user=user, status="registered").exists():  # type: ignore
             return False, "Already registered for this event."
 
         return True, "Can register."
 
     @property
-    def is_upcoming(self):
-        """Check if event is in the future."""
+    def is_upcoming(self) -> bool:
+        """
+        Check if event is in the future.
+        Returns:
+            bool: True if event date is today or in the future.
+        """
         return self.date >= timezone.now().date()
 
     @property
-    def is_past(self):
-        """Check if event is in the past."""
+    def is_past(self) -> bool:
+        """
+        Check if event is in the past.
+        Returns:
+            bool: True if event date is before today.
+        """
         return self.date < timezone.now().date()
 
     @property
-    def registration_count(self):
-        """Return number of current active registrations."""
-        return self.registrations.filter(status="registered").count()
+    def registration_count(self) -> int:
+        """
+        Return number of current active registrations.
+        Returns:
+            int: Count of active registrations for this event.
+        """
+        return self.registrations.filter(status="registered").count()  # type: ignore
 
     @property
-    def can_be_cancelled(self):
-        """Check if event can be cancelled."""
+    def can_be_cancelled(self) -> bool:
+        """
+        Check if event can be cancelled.
+        Returns:
+            bool: True if event status is 'published'.
+        """
         return self.status == "published"
 
 
 class EventRegistration(models.Model):
-    """Model representing user registration for an event."""
+    """
+    Model representing user registration for an event.
 
-    STATUS_CHOICES = (
+    Handles user registration lifecycle including validation,
+    cancellation, and status management.
+    """
+
+    STATUS_CHOICES: tuple[tuple[str, str], ...] = (
         ("registered", "Registered"),
         ("cancelled", "Cancelled"),
     )
 
-    user = models.ForeignKey(
+    user: models.ForeignKey = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
         related_name="registrations",
     )
-    event = models.ForeignKey(
+    event: models.ForeignKey = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
         related_name="registrations",
     )
-    status = models.CharField(
+    status: models.CharField = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
         default="registered",
     )
-    registered_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    registered_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: models.DateTimeField = models.DateTimeField(auto_now=True)
 
     class Meta:
         """
+        Meta configuration for EventRegistration model.
+
         Adds constraints for each user can only register once per event.
         Adds indexes for faster filtering by user-status and event-status.
         """
@@ -258,11 +339,21 @@ class EventRegistration(models.Model):
         ordering = ["-registered_at"]
 
     def __str__(self):
-        """String representation."""
-        return f"{self.user.email} - {self.event.title}"
+        """
+        String representation of the registration.
+        Returns:
+            str: Formatted string with user email and event title.
+        """
+        user_identifier = getattr(self.user, "email", str(self.user))
+        return f"{user_identifier} - {self.event.title}"
 
     def clean(self):
-        """Perform custom validation for registration model."""
+        """
+        Perform custom validation for registration model.
+        Validates registration eligibility and cancellation permissions.
+        Raises:
+            ValidationError: If validation fails.
+        """
         super().clean()
 
         # Validate new registrations or status changes to registered
@@ -282,21 +373,34 @@ class EventRegistration(models.Model):
             except EventRegistration.DoesNotExist:
                 pass
 
-    def save(self, *args, **kwargs):
-        """Ensure validation is always performed before saving."""
+    def save(self, *args, **kwargs) -> None:
+        """
+        Ensure validation is always performed before saving.
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         self.full_clean()
         super().save(*args, **kwargs)
 
     def can_cancel(self):
-        """Check if registration can be cancelled."""
+        """
+        Check if registration can be cancelled.
+        Returns:
+            bool: True if registration is active and event allows cancellation.
+        """
         return (
             self.status == "registered"
             and self.event.status == "published"
             and self.event.is_upcoming
         )
 
-    def cancel_registration(self):
-        """Cancel the registration."""
+    def cancel_registration(self) -> None:
+        """
+        Cancel the registration.
+        Raises:
+        ValueError: If registration cannot be cancelled.
+        """
         if not self.can_cancel():
             raise ValueError("Cannot cancel this registration.")
 
