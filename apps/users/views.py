@@ -35,7 +35,7 @@ def signup(request: HttpRequest) -> HttpResponse:
         form = CustomUserSignupForm(data=request.POST)
 
         if form.is_valid():
-            # Create user but don't save to database yet
+            # Create user but don't save to a database yet
             new_user: CustomUser = form.save(commit=False)
             new_user.is_active = False  # User must confirm email first
             new_user.save()
@@ -48,7 +48,7 @@ def signup(request: HttpRequest) -> HttpResponse:
             )
             return render(request, "index.html")
     else:
-        # Display blank registration form
+        # Display a blank registration form
         form = CustomUserSignupForm()
 
     # Display form
@@ -58,7 +58,7 @@ def signup(request: HttpRequest) -> HttpResponse:
 
 def activate(request: HttpRequest, uidb64: str, token: str) -> HttpResponseRedirect:
     """
-    Activate user account when they click the confirmation link in email.
+    Activate user accounts when they click the confirmation link in email.
     Args:
         request: HTTP request object
         uidb64: Base64 encoded user ID
@@ -69,7 +69,7 @@ def activate(request: HttpRequest, uidb64: str, token: str) -> HttpResponseRedir
     # Try to decode the user ID and find the user
     user: Optional[CustomUser] = get_user_from_token(uidb64)
 
-    # Check if user exists and token is valid
+    # Check if user exists and the token is valid
     if user is not None and default_token_generator.check_token(user, token):
         # Activate the user account
         user.is_active = True
