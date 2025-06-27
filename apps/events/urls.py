@@ -17,7 +17,7 @@ urlpatterns = [
         views.export_registrations_csv,
         name="export_csv",
     ),
-    # Page for confirm cancel own created event (creator)
+    # Page for confirmation cancel own created event (creator)
     path(
         "events/<int:event_id>/cancel_event/",
         views.cancel_event,
@@ -33,7 +33,7 @@ urlpatterns = [
     ),
     # Page for view own registered events (visitor only)
     path("my_registrations/", views.my_registrations, name="my_registrations"),
-    # Page for confirm cancel registration on event (visitor only)
+    # Page for confirmation cancel registration on event (visitor only)
     path(
         "events/<int:event_id>/cancel_registration/",
         views.cancel_registration,
