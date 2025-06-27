@@ -1,14 +1,12 @@
-from django.test import TestCase, Client
+from django.test import Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from tests.base import BaseTestCase
 from tests.factories import (
-    CreatorFactory,
-    VisitorFactory,
     EventFactory,
     RegistrationFactory,
 )
-from apps.events.models import Event, EventRegistration
+from apps.events.models import EventRegistration
 from event_manager import settings
 
 User = get_user_model()

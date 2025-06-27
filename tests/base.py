@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from .factories import UserFactory, CreatorFactory, VisitorFactory, EventFactory
+from .factories import CreatorFactory, VisitorFactory
 
 User = get_user_model()
 
