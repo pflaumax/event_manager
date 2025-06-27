@@ -83,6 +83,7 @@ Build a basic Django web application where users can:
 - [x] Export registrations as CSV
 - [x] Unit tests (event, registrations, users: models, views)
 - [ ] Add Docker support (Dockerfile + docker-compose)
+- [ ] Add API (Django REST framework) for all pages
 - [ ] Add responsive frontend design (bootstrap/tailwind)
 - [ ] Set image upload into production (railway + whitenoise/staticfiles)
 - [ ] Deploy to production with Docker and Postgres
