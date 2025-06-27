@@ -11,7 +11,7 @@ class CustomUserSignupForm(UserCreationForm):
     different user types during registration.
 
     Attributes:
-        role: ChoiceField for selecting user role (Creator or Visitor).
+        role: ChoiceField for selecting a user role (Creator or Visitor).
         Creator can create events, Visitor can register for events
     """
 
