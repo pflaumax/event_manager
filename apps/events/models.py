@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import Tuple
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -11,7 +11,7 @@ from apps.users.models import CustomUser
 
 
 class EventManager(models.Manager):
-    """Custom manager for Event model with type-safe query methods."""
+    """Custom manager for an Event model with type-safe query methods."""
 
     def past(self) -> QuerySet["Event"]:
         """
@@ -104,7 +104,7 @@ class Event(models.Model):
 
     class Meta:
         """
-        Meta configuration for Event model.
+        Meta configuration for an Event model.
 
         Orders events by date and start time.
         Adds indexes for faster filtering by date, status, and creator.
@@ -216,7 +216,7 @@ class Event(models.Model):
     def _cancel_all_registrations(self) -> None:
         """
         Cancel all active registrations for cancelled event.
-        Private method to handle registration cancellation when event is cancelled.
+        Private method to handle registration cancellation when an event is cancelled.
         """
         self.registrations.filter(status="registered").update(  # type: ignore
             status="cancelled", updated_at=timezone.now()
@@ -348,7 +348,7 @@ class EventRegistration(models.Model):
 
     def clean(self):
         """
-        Perform custom validation for registration model.
+        Perform custom validation for a registration model.
         Validates registration eligibility and cancellation permissions.
         Raises:
             ValidationError: If validation fails.
