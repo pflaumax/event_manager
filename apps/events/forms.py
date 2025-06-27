@@ -6,7 +6,7 @@ from .models import Event
 class EventForm(forms.ModelForm):
     """
     A form for creating or editing events.
-    This form handles the creation and editing of Event instances,
+    This form handles the creation and editing of Event instances
     with custom widgets and validation logic.
     Attributes:
         user: Optional User instance passed from the view for validation purposes.
@@ -44,7 +44,7 @@ class EventForm(forms.ModelForm):
         Initialize the form and optionally store the user passed from the view.
         Args:
             *args: Variable length argument list passed to parent class.
-            **kwargs: Arbitrary keyword arguments. 'user' key is extracted if present for use in validation.
+            **kwargs: Arbitrary keyword arguments. 'User' key is extracted if present for use in validation.
         """
 
         self.user = kwargs.pop("user", None)  # Extract user from kwargs

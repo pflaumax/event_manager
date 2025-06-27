@@ -27,7 +27,7 @@ def new_event(request: HttpRequest) -> HttpResponse:
     Returns:
         HttpResponse: Rendered template for event creation or redirect after successful creation.
     Raises:
-        None: Redirects with error message if user cannot create events.
+        None: Redirects with an error message if user cannot create events.
     """
     # Check if user can create events
     user = cast("CustomUser", request.user)
@@ -288,7 +288,7 @@ def register_for_event(
     request: HttpRequest, event_id: int
 ) -> Union[HttpResponseRedirect, HttpResponse]:
     """
-    Register visitor for an event with confirmation.
+    Register a visitor for an event with confirmation.
     Args:
         request: The HTTP request object.
         event_id: The ID of the event to register for.
