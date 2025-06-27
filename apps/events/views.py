@@ -54,7 +54,7 @@ def new_event(request: HttpRequest) -> HttpResponse:
 @login_required
 def my_events(request: HttpRequest) -> HttpResponse:
     """
-    Show events created by current creator.
+    Show events created by the current creator.
     Args:
         request: The HTTP request object.
     Returns:
@@ -86,7 +86,7 @@ def event_details(
         HttpResponse: Rendered template with event details.
 
     Raises:
-        Http404: If event doesn't exist or user lacks permission to view it.
+        Http404: If an event doesn't exist or user lacks permission to view it.
     """
     event: Event = get_object_or_404(Event, id=event_id)
 
@@ -99,7 +99,7 @@ def event_details(
     ):
         raise Http404("You are not allowed to view this event details.")
 
-    # Check if visitor can register for event
+    # Check if a visitor can register for event
     can_register: bool
     message: str
     can_register, message = event.can_register(request.user)
@@ -129,7 +129,7 @@ def edit_event(
     Returns:
         HttpResponse: Rendered template for event editing or redirect after successful edit.
     Raises:
-        Http404: If event doesn't exist or user lacks permission to edit it.
+        Http404: If an event doesn't exist or user lacks permission to edit it.
     """
     event: Event = get_object_or_404(Event, id=event_id)
 
@@ -149,7 +149,7 @@ def edit_event(
             messages.success(request, "Event edited successfully.")
             return redirect("events:my_events")
     else:
-        # Show form with existing data for GET request
+        # Show a form with existing data for GET request
         form = EventForm(instance=event, user=request.user)
 
     context = {
@@ -214,7 +214,7 @@ def cancel_event(
     request: HttpRequest, event_id: int
 ) -> Union[HttpResponseRedirect, HttpResponse]:
     """
-    Display confirmation page for canceling event.
+    Display confirmation page for cancelling event.
     Args:
         request: The HTTP request object.
         event_id: The ID of the event to cancel.
@@ -259,7 +259,7 @@ def browse_events(request: HttpRequest) -> HttpResponse:
     Args:
         request: The HTTP request object.
     Returns:
-        HttpResponse: Rendered template with filtered events list.
+        HttpResponse: Rendered template with a filtered events list.
     """
     status: str = request.GET.get("status", "published")
     search_query: str = request.GET.get("q", "")
@@ -352,7 +352,7 @@ def cancel_registration(
     request: HttpRequest, event_id: int
 ) -> Union[HttpResponseRedirect, HttpResponse]:
     """
-    Display confirmation page for canceling registration.
+    Display confirmation page for cancelling registration.
     Args:
         request: The HTTP request object.
         event_id: The ID of the event to cancel registration for.
@@ -382,7 +382,7 @@ def cancel_registration(
             messages.error(request, str(e))
             return redirect("events:my_registrations")
 
-    # GET: check if can show confirmation page
+    # GET: check if it can show confirmation page
     if not registration.can_cancel():
         messages.error(request, "Cannot cancel registration.")
         return redirect("events:my_registrations")
