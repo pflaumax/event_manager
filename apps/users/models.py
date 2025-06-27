@@ -169,18 +169,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     @property
     def is_creator(self) -> bool:
         """
-        Check if user has creator role.
+        Check if user has a creator role.
         Returns:
-            bool: True if user is an event creator, False otherwise
+            bool: True if a user is an event creator, False otherwise
         """
         return self.role == "creator"
 
     @property
     def is_visitor(self) -> bool:
         """
-        Check if user has visitor role.
+        Check if a user has a visitor role.
         Returns:
-            bool: True if user is a visitor, False otherwise
+            bool: True if the user is a visitor, False otherwise
         """
         return self.role == "visitor"
 
