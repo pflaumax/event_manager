@@ -1,16 +1,9 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from . import views
-from .views_api import EventViewSet, EventRegistrationViewSet
 
-router = DefaultRouter()
-router.register(r"events", EventViewSet)
-router.register(r"registrations", EventRegistrationViewSet)
 
 app_name = "events"
 urlpatterns = [
-    # Add events API URL
-    path("api/", include(router.urls)),
     # Page for adding new event (creator only)
     path("new_event/", views.new_event, name="new_event"),
     # Page for viewing own created events (creator only)

@@ -21,6 +21,8 @@ urlpatterns = [
     path("users/", include("apps.users.urls")),
     # Event-related routes (creating, viewing)
     path("", include("apps.events.urls")),
+    # Event API URL page
+    path("", include("apps.events.urls_api")),
 ]
 
 # Service for upload media files (Debug mode)
