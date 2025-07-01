@@ -15,6 +15,8 @@ urlpatterns = [
     path("", views.index, name="index"),
     # Homepage after login/registration
     path("home/", views.home, name="home"),
+    # Users API URL page
+    path("api/users", include("apps.users.urls_api")),
     # User-related routes (login, registration)
     path("users/", include("apps.users.urls")),
     # Event-related routes (creating, viewing)
