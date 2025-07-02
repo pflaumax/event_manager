@@ -44,6 +44,7 @@ class EventSerializer(serializers.ModelSerializer):
             "created_by",
             "created_at",
             "updated_at",
+            "registered_count",
         ]
 
     def get_registered_count(self, obj: Event) -> int:
@@ -71,6 +72,7 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "event",
+            "event_title",
             "status",
             "registered_at",
             "updated_at",

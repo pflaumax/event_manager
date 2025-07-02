@@ -11,12 +11,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["username", "email", "password", "role"]
+        fields = ["email", "password", "role"]
 
     def create(self, validated_data: Dict[str, Any]) -> CustomUser:
         """Create new user with hashed password."""
         user = CustomUser(
-            username=validated_data["username"],
             email=validated_data["email"],
             role=validated_data.get("role", "visitor"),
         )

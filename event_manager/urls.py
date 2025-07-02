@@ -11,19 +11,18 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # Debug toolbar
-    # path("__debug__/", include(debug_toolbar.urls)),
-    # Admin panel for superusers
+    # Admin panel
     path("admin/", admin.site.urls),
     # Welcome page
     path("", views.index, name="index"),
-    # Homepage after login/registration
     path("home/", views.home, name="home"),
     # API URLs
     path("", include("apps.users.urls_api")),  # /api/users/
     path("", include("apps.events.urls_api")),  # /api/events/, /api/registrations/
-    # path("api/users", include("apps.users.urls_api")),
-    # Regular web views
+    # JWT Token endpoints
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    # Regular web views (if you have them)
     path("users/", include("apps.users.urls")),
     path("", include("apps.events.urls")),
 ]
