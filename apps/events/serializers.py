@@ -1,16 +1,18 @@
 from rest_framework import serializers
 from datetime import date as dt_date
+from typing import Dict, Any
 from .models import Event, EventRegistration
 
 
 class EventListSerializer(serializers.ModelSerializer):
-    """Simplified serializer for event list view"""
+    """Serializer for event list view with minimal fields."""
 
     created_by = serializers.ReadOnlyField(source="created_by.username")
 
     class Meta:
         model = Event
         fields = [
+            "id",
             "title",
             "description",
             "location",
@@ -24,12 +26,15 @@ class EventListSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+    """Detailed serializer for event with additional fields."""
+
     created_by = serializers.ReadOnlyField(source="created_by.username")
     registered_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Event
         fields = [
+            "id",
             "title",
             "description",
             "location",
@@ -41,21 +46,21 @@ class EventSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-    def get_registered_count(self, obj):
-        return obj.registrations.count()
+    def get_registered_count(self, obj: Event) -> int:
+        """Get count of users registered for this event."""
+        return obj.registrations.count()  # type: ignore
 
-    def validate(self, data):
+    def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate event data."""
         event_date = data.get("date")
         if event_date and event_date < dt_date.today():
             raise serializers.ValidationError("Event date cannot be in the past.")
         return data
 
-    def create(self, validated_data):
-        validated_data["created_by"] = self.context["request"].user
-        return super().create(validated_data)
-
 
 class EventRegistrationSerializer(serializers.ModelSerializer):
+    """Serializer for event registrations."""
+
     user = serializers.ReadOnlyField(source="user.username")
     event_title = serializers.ReadOnlyField(source="event.title")
     registered_at = serializers.ReadOnlyField()
@@ -63,6 +68,7 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventRegistration
         fields = [
+            "id",
             "user",
             "event",
             "status",
@@ -70,7 +76,8 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-    def validate(self, data):
+    def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Validate registration data to prevent duplicates."""
         user = self.context["request"].user
         event = data.get("event")
 
@@ -80,6 +87,19 @@ class EventRegistrationSerializer(serializers.ModelSerializer):
             )
         return data
 
-    def create(self, validated_data):
+    def create(self, validated_data: Dict[str, Any]) -> EventRegistration:
+        """Create registration with current user."""
         validated_data["user"] = self.context["request"].user
         return super().create(validated_data)
+
+
+class MyRegistrationsSerializer(serializers.ModelSerializer):
+    """Simplified serializer for user's own registrations."""
+
+    event_title = serializers.ReadOnlyField(source="event.title")
+    event_date = serializers.ReadOnlyField(source="event.date")
+    event_location = serializers.ReadOnlyField(source="event.location")
+
+    class Meta:
+        model = EventRegistration
+        fields = ["id", "event_title", "event_date", "event_location", "registered_at"]

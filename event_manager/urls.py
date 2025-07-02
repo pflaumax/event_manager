@@ -1,6 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 # import debug_toolbar
 from django.conf import settings
@@ -15,14 +19,13 @@ urlpatterns = [
     path("", views.index, name="index"),
     # Homepage after login/registration
     path("home/", views.home, name="home"),
-    # Users API URL page
-    path("api/users", include("apps.users.urls_api")),
-    # User-related routes (login, registration)
+    # API URLs
+    path("", include("apps.users.urls_api")),  # /api/users/
+    path("", include("apps.events.urls_api")),  # /api/events/, /api/registrations/
+    # path("api/users", include("apps.users.urls_api")),
+    # Regular web views
     path("users/", include("apps.users.urls")),
-    # Event-related routes (creating, viewing)
     path("", include("apps.events.urls")),
-    # Event API URL page
-    path("", include("apps.events.urls_api")),
 ]
 
 # Service for upload media files (Debug mode)

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from typing import Dict, Any
 from .models import CustomUser
 from apps.events.models import EventRegistration
 
@@ -12,11 +13,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ["username", "email", "password", "role"]
 
-    def create(self, validated_data):
+    def create(self, validated_data: Dict[str, Any]) -> CustomUser:
+        """Create new user with hashed password."""
         user = CustomUser(
             username=validated_data["username"],
             email=validated_data["email"],
-            role=validated_data["role", "visitor"],
+            role=validated_data.get("role", "visitor"),
         )
         user.set_password(validated_data["password"])
         user.save()
@@ -29,7 +31,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ["id", "username", "email", "role", "date_joined"]
-        read_only_fields = fields
+        read_only_fields = ["id", "date_joined"]
 
 
 class LoginSerializer(serializers.Serializer):
@@ -40,7 +42,7 @@ class LoginSerializer(serializers.Serializer):
 
 
 class MyRegistrationsSerializer(serializers.ModelSerializer):
-    """Simplified serializer for user's registrations"""
+    """Simplified serializer for user's registrations."""
 
     event_title = serializers.ReadOnlyField(source="event.title")
     event_date = serializers.ReadOnlyField(source="event.date")

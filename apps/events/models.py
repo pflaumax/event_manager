@@ -307,7 +307,7 @@ class EventRegistration(models.Model):
     event: models.ForeignKey = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
-        related_name="registrations",
+        related_name="registrations",  # MyPy can't see that
     )
     status: models.CharField = models.CharField(
         max_length=10,
