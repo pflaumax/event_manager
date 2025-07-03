@@ -54,7 +54,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def my_events(self, request):
-        """Get events created by current user."""
+        """Get events created by current creator."""
         if request.user.role != "creator":
             return Response(
                 {"detail": "Only Event Creators can view their events."},
@@ -91,7 +91,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        event.cancel_event()
+        event.cancel_event(request.user)
         return Response(
             {"detail": "Event cancelled successfully."}, status=status.HTTP_200_OK
         )
@@ -144,7 +144,7 @@ class EventRegistrationViewSet(viewsets.ModelViewSet):
         return EventRegistration.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        """Create registration with validation."""
+        """Visitor registration for event."""
         user = self.request.user
 
         # Only visitors can register for events
