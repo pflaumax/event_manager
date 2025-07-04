@@ -101,3 +101,9 @@ c_signup.html
 tmp/
 c_registration_email.html
 c_cancellation_email.html
+templates/**hard_base.html
+templates/**hard_home.html
+templates/**hard_index.html
+templates/*base.html
+templates/*home.html
+templates/*index.html

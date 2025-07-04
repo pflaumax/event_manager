@@ -1,48 +1,91 @@
 {% extends 'base.html' %}
 
+{% block title %}Profile - {{ user.username }}{% endblock %}
+
 {% block content %}
-
-{% if user.is_authenticated %}
-  <h3>{{ user.username }}</h3>
-  <p>{{ user.get_role_display }}</p>
-{% else %}
-{% endif %}
-
-<h3>Welcome to the home page!</h3> 
-
-{% if user.is_authenticated and user.is_creator %}
-  <a href="{% url 'events:new_event' %}" class="btn btn-primary"><button>Add new event</button></a>
-  <a href="{% url 'events:my_events' %}" class="btn btn-primary"><button>My events</button></a>
-
-{% else %}
-  <a href="{% url 'events:browse_events' %}" class="btn btn-primary"><button>Browse events</button></a>
-  <a href="{% url 'events:my_registrations' %}">
-        <button>My registrations</button>
-  </a>
-{% endif %}
-
-
-<p>Email Address: {{ user.email }}</p>
-<p>Account Role: {{ user.role_display }} 
-  {% if user.is_creator %} 
-    Can create and manage own events. 
-  {% else %} 
-    Can browse and register for events.</p> 
-  {% endif %}
-
-<p>Member Since: {{ user.date_joined|date:"F d, Y" }}</p>
-
-{% if form.errors %}
-  <ul class="errorlist">
-    {% for field in form %}
-      {% for error in field.errors %}
-        <li>{{ field.label }}: {{ error }}</li>
-      {% endfor %}
-    {% endfor %}
-    {% for error in form.non_field_errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
-
-{% endblock content %}
+<div class="profile-card glass-card">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <h2>{{ user.username }}</h2>
+        <span class="role-badge role-{{ user.role }}">
+            <i class="fas fa-{% if user.is_creator %}crown{% else %}eye{% endif %}"></i>
+            {{ user.get_role_display }}
+        </span>
+    </div>
+    
+    <div class="profile-info">
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-label">Email Address</div>
+                <p class="info-value">{{ user.email }}</p>
+            </div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-user-tag"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-label">Account Role</div>
+                <p class="info-value">
+                    {{ user.get_role_display }}
+                    {% if user.is_creator %}
+                        - Can create and manage events
+                    {% else %}
+                        - Can browse and register for events
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-calendar-plus"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-label">Member Since</div>
+                <p class="info-value">{{ user.date_joined|date:"F d, Y" }}</p>
+            </div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fas fa-{% if user.is_active %}check-circle{% else %}times-circle{% endif %}"></i>
+            </div>
+            <div class="info-content">
+                <div class="info-label">Account Status</div>
+                <p class="info-value">
+                    {% if user.is_active %}
+                        <span class="text-success">Active</span>
+                    {% else %}
+                        <span class="text-danger">Inactive</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        {% if user.is_creator %}
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-plus"></i>Create New Event
+            </a>
+            <a href="#" class="btn btn-outline-primary">
+                <i class="fas fa-list"></i>View My Events
+            </a>
+        {% else %}
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-calendar"></i>Browse Events
+            </a>
+            <a href="#" class="btn btn-outline-primary">
+                <i class="fas fa-ticket-alt"></i>My Registrations
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
