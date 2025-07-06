@@ -1,7 +1,7 @@
 from typing import Optional, Iterable
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail, send_mass_mail
@@ -17,6 +17,21 @@ from .forms import CustomUserSignupForm
 
 # Get the user model (settings.py)
 User = get_user_model()
+
+
+def login_view(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+        else:
+            messages.error(request, "Invalid email or password")
+
+    return render(request, "users/login.html")
 
 
 def signup(request: HttpRequest) -> HttpResponse:

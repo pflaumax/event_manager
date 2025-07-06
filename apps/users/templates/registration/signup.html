@@ -1,14 +1,87 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
+{% block title %}Sign Up - Event Manager{% endblock %}
+
 {% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="glass-card" style="max-width: 500px; margin: 2rem auto;">
+            <div class="text-center mb-4">
+                <div class="profile-avatar" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 auto 1.5rem; background: var(--success-gradient);">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2 class="mb-2">Create Account</h2>
+                <p class="text-muted">Join Event Manager to creating or attending events</p>
+            </div>
 
-<h2>Sign up</h2>
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-bold">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" required
+                           style="padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px;">
+                </div>
 
-<form action="{% url 'users:signup' %}" method="post">
-  {% csrf_token %}
-  {{ form.as_div }}
+                <div class="mb-3">
+                    <label for="username" class="form-label fw-bold">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required 
+                           style="padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px;">
+                </div>
 
-  <button type="submit">Sign up</button>
-</form>
 
-{% endblock content %}
+                <div class="mb-3">
+                    <label for="password1" class="form-label fw-bold">Password</label>
+                    <input type="password" class="form-control" id="password1" name="password1" required
+                           style="padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px;">
+                </div>
+
+                <div class="mb-3">
+                    <label for="password2" class="form-label fw-bold">Confirm Password</label>
+                    <input type="password" class="form-control" id="password2" name="password2" required
+                           style="padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px;">
+                </div>
+
+                <div class="mb-3">
+                    <label for="role" class="form-label fw-bold">Account Type</label>
+                    <select class="form-control" id="role" name="role" required
+                            style="padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer;">
+                        <option value="">Choose your account type</option>
+                        <option value="creator">Event Creator</option>
+                        <option value="visitor">Event Visitor</option>
+                    </select>
+                    <div class="profile-info mt-2">
+                        <div class="info-item">
+                            <div class="info-icon" style="width: 30px; height: 30px; font-size: 0.9rem;">
+                                <i class="fas fa-crown"></i>
+                            </div>
+                            <div class="info-content">
+                                <span style="font-size: 0.9rem;"><strong>Event Creator:</strong> Create and manage your own events</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon" style="width: 30px; height: 30px; font-size: 0.9rem;">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="info-content">
+                                <span style="font-size: 0.9rem;"><strong>Event Visitor:</strong> Browse and register for events</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" style="background: var(--success-gradient);">
+                    <i class="fas fa-user-plus"></i>Create Account
+                </button>
+            </form>
+
+            <div class="text-center mt-4" style="padding-top: 1.5rem; border-top: 1px solid #e9ecef;">
+                <p class="mb-0">Already have an account? <a href="{% url 'users:login' %}" style="color: #667eea; text-decoration: none;">Sign in here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

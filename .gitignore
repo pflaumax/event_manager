@@ -92,7 +92,7 @@ postgres-data/
 data/postgres/
 
 settings_config.py
-mail.html
+с_mail.html
 ref.py
 structure.txt
 c_login.html
