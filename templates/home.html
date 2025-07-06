@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Profile - {{ user.username }}{% endblock %}
+{% block title %}Profile, {{ user.username }}{% endblock %}
 
 {% block content %}
 <div class="profile-card glass-card">
@@ -9,6 +9,7 @@
             <i class="fas fa-user"></i>
         </div>
         <h2>{{ user.username }}</h2>
+        <br>
         <span class="role-badge role-{{ user.role }}">
             <i class="fas fa-{% if user.is_creator %}crown{% else %}eye{% endif %}"></i>
             {{ user.get_role_display }}
@@ -72,20 +73,20 @@
     
     <div class="action-buttons">
         {% if user.is_creator %}
-            <a href="#" class="btn btn-primary">
+            <a href="{% url 'events:new_event' %}" class="btn btn-primary">
                 <i class="fas fa-plus"></i>Create New Event
             </a>
-            <a href="#" class="btn btn-outline-primary">
+            <a href="{% url 'events:my_events' %}" class="btn btn-outline-primary">
                 <i class="fas fa-list"></i>View My Events
             </a>
         {% else %}
-            <a href="#" class="btn btn-primary">
+            <a href="{% url 'events:browse_events' %}" class="btn btn-primary">
                 <i class="fas fa-calendar"></i>Browse Events
             </a>
-            <a href="#" class="btn btn-outline-primary">
+            <a href="{% url 'events:my_registrations' %}" class="btn btn-outline-primary">
                 <i class="fas fa-ticket-alt"></i>My Registrations
             </a>
         {% endif %}
     </div>
 </div>
-{% endblock %}
+{% endblock content%}

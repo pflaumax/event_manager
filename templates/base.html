@@ -5,18 +5,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Event Management System{% endblock %}</title>
+    <title>{% block title %}Event Manager{% endblock %}</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="{% static 'styles.css' %}" rel="stylesheet">
-    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
             <div class="nav-container">
-                <a href="{% url 'home' %}" class="navbar-brand">
-                    <i class="fas fa-calendar-alt"></i>EventHub
+                <a href="{% url 'index' %}" class="navbar-brand">
+                    <i class="fas fa-calendar-alt"></i>Event Manager
                 </a>
                 
                 <div class="mobile-toggle" onclick="toggleMobileMenu()">
@@ -28,21 +27,22 @@
                 <ul class="nav-links" id="navLinks">
                     {% if user.is_authenticated %}
                         {% if user.is_creator %}
-                            <li><a href="#" class="nav-link"><i class="fas fa-plus"></i>Create Event</a></li>
-                            <li><a href="#" class="nav-link"><i class="fas fa-list"></i>My Events</a></li>
+                            <li><a href="{% url 'events:new_event' %}" class="nav-link"><i class="fas fa-plus"></i>Create Event</a></li>
+                            <li><a href="{% url 'events:my_events' %}" class="nav-link"><i class="fas fa-list"></i>My Events</a></li>
                         {% else %}
-                            <li><a href="#" class="nav-link"><i class="fas fa-calendar"></i>Browse Events</a></li>
-                            <li><a href="#" class="nav-link"><i class="fas fa-ticket-alt"></i>My Registrations</a></li>
+                            <li><a href="{% url 'events:browse_events' %}" class="nav-link"><i class="fas fa-calendar"></i>Browse Events</a></li>
+                            <li><a href="{% url 'events:my_registrations' %}" class="nav-link"><i class="fas fa-ticket-alt"></i>My Registrations</a></li>
                         {% endif %}
                         <li><a href="{% url 'home' %}" class="nav-link"><i class="fas fa-user"></i>Profile</a></li>
                         <form action="{% url 'users:logout' %}" method="post">
                             {% csrf_token %}
-                            <button name="submit">Log out</button>
+                             <button type="submit" class="nav-link btn btn-link p-0 m-0 align-baseline">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </button>
                         </form>
 
                     {% else %}
-                        <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
-                        <li><a href="#about" class="nav-link">About</a></li>
+                        <li><a href="{% url 'index' %}" class="nav-link">Home</a></li>
                         <li><a href="{% url 'users:login' %}" class="nav-link">Login</a></li>
                         <li><a href="{% url 'users:signup' %}" class="nav-link">Sign Up</a></li>
                     {% endif %}
@@ -73,30 +73,22 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h5><i class="fas fa-calendar-alt"></i> EventHub</h5>
+                    <h5><i class="fas fa-calendar-alt"></i> Event Manager</h5>
                     <p>Your complete event management solution. Create, manage, and attend events with ease.</p>
                 </div>
                 <div class="footer-section">
                     <h6>Quick Links</h6>
                     {% if user.is_authenticated %}
-                        <a href="#">Dashboard</a>
-                        <a href="#">Events</a>
+                        <a href="{% url 'events:browse_events' %}">Events</a>
                         <a href="{% url 'home' %}">Profile</a>
                     {% else %}
-                        <a href="{% url 'home' %}">Home</a>
-                        <a href="#about">About</a>
+                        <a href="{% url 'index' %}">Home</a>
                         <a href="{% url 'users:login' %}">Login</a>
                     {% endif %}
                 </div>
-                <div class="footer-section">
-                    <h6>Support</h6>
-                    <a href="#">Help Center</a>
-                    <a href="#">Contact Us</a>
-                    <a href="#">Privacy Policy</a>
-                </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 EventHub. All rights reserved.</p>
+                <p>&copy; 2025 Event Manager</p>
             </div>
         </div>
     </footer>
