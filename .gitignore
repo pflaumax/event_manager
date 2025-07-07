@@ -107,3 +107,12 @@ templates/**hard_index.html
 templates/*base.html
 templates/*home.html
 templates/*index.html
+apps/events/templates/events/*browse_events.html
+apps/events/templates/events/*cancel_event.html
+apps/events/templates/events/*cancel_registration.html
+apps/events/templates/events/*edit_event.html
+apps/events/templates/events/*event_details.html
+apps/events/templates/events/*my_events.html
+apps/events/templates/events/*my_registrations.html
+apps/events/templates/events/*new_event.html
+apps/events/templates/events/*register_confirm.html

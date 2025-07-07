@@ -1,26 +1,121 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
+{% block title %}My Registrations - Event Manager{% endblock %}
 
 {% block content %}
-<h2>My Event Registrations</h2>
-
-{% if registrations %}
-    <ul>
-    {% for reg in registrations %}
-        <li>
-            <a href="{% url 'events:event_details' reg.event.id %}">{{ reg.event.title }}</a>
-
-            {% if reg.can_cancel %}
-                <a href="{% url 'events:cancel_registration' reg.event.id %}">
-                    <button type="button">Cancel Registration</button>
-                </a>
+<div class="glass-card">
+    <div class="text-center mb-4">
+        <div class="feature-icon" style="margin: 0 auto 2rem;">
+            <i class="fas fa-ticket-alt"></i>
+        </div>
+        <h1 class="mb-3">My Registrations</h1>
+        <p class="lead">View and manage your event registrations</p>
+    </div>
+    
+    <!-- Registration Statistics -->
+    <div class="stats-grid mb-4">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_registrations }}</div>
+            <div class="stat-label">Total Registrations</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ upcoming_registrations }}</div>
+            <div class="stat-label">Upcoming Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ past_registrations }}</div>
+            <div class="stat-label">Past Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ cancelled_registrations }}</div>
+            <div class="stat-label">Cancelled Events</div>
+        </div>
+    </div>
+    
+    <!-- Filter Tabs -->
+    <div class="text-center mb-4">
+        <div class="btn-group">
+            <a href="?filter=all" class="btn {% if request.GET.filter == 'all' or not request.GET.filter %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                <i class="fas fa-list"></i> All
+            </a>
+            <a href="?filter=upcoming" class="btn {% if request.GET.filter == 'upcoming' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                <i class="fas fa-calendar-plus"></i> Upcoming
+            </a>
+            <a href="?filter=past" class="btn {% if request.GET.filter == 'past' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                <i class="fas fa-history"></i> Past
+            </a>
+        </div>
+    </div>
+    
+    <!-- Registrations Grid -->
+    <div class="features-grid">
+        {% for registration in registrations %}
+        <div class="feature-card">
+            <div class="feature-icon">
+                {% if registration.event.is_cancelled %}
+                    <i class="fas fa-times-circle text-danger"></i>
+                {% elif registration.event.is_past %}
+                    <i class="fas fa-check-circle text-success"></i>
+                {% else %}
+                    <i class="fas fa-calendar-check text-primary"></i>
+                {% endif %}
+            </div>
+            
+            <h4>{{ registration.event.title }}</h4>
+            
+            <p class="text-muted mb-2">
+                <i class="fas fa-map-marker-alt"></i> {{ registration.event.location }}
+            </p>
+            
+            <p class="text-muted mb-2">
+                <i class="fas fa-clock"></i> {{ registration.event.date|date:"M d, Y" }} at {{ registration.event.time }}
+            </p>
+            
+            <p class="text-muted mb-2">
+                <i class="fas fa-user"></i> Created by: {{ registration.event.creator.first_name }} {{ registration.event.creator.last_name }}
+            </p>
+            
+            <p class="text-muted mb-3">
+                <i class="fas fa-calendar-plus"></i> Registered: {{ registration.registered_at|date:"M d, Y" }}
+            </p>
+            
+            <!-- Status Badge -->
+            {% if registration.event.is_cancelled %}
+                <span class="role-badge" style="background: #dc3545;">Event Cancelled</span>
+            {% elif registration.event.is_past %}
+                <span class="role-badge" style="background: #28a745;">Attended</span>
             {% else %}
-                <span>Cannot cancel registration</span>
+                <span class="role-badge role-visitor">Registered</span>
             {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>You have no registrations yet.</p>
-{% endif %}
-
-{% endblock content %}
+            
+            <div class="action-buttons mt-3">
+                <a href="{% url 'events:event_details' registration.event.id %}" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> View Event
+                </a>
+                {% if not registration.event.is_cancelled and not registration.event.is_past %}
+                    <a href="{% url 'events:cancel_registration' registration.event.id %}" class="btn btn-outline-danger">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center">
+            <p class="text-muted">You haven't registered for any events yet.</p>
+            <a href="{% url 'events:browse_events' %}" class="btn btn-primary">
+                <i class="fas fa-search"></i> Browse Events
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Browse Events CTA -->
+    {% if registrations %}
+    <div class="text-center mt-4">
+        <a href="{% url 'events:browse_events' %}" class="btn btn-outline-primary">
+            <i class="fas fa-search"></i> Browse More Events
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
