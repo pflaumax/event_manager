@@ -1,5 +1,6 @@
 from typing import Any
 from django import forms
+from django.core.exceptions import PermissionDenied
 from .models import Event
 
 
@@ -49,3 +50,28 @@ class EventForm(forms.ModelForm):
 
         self.user = kwargs.pop("user", None)  # Extract user from kwargs
         super().__init__(*args, **kwargs)
+
+    def clean(self):
+        """
+        Perform custom validation before model's clean() is called.
+        Ensures the user has 'creator' role before proceeding.
+        """
+        if not self.user or not getattr(self.user, "is_creator", False):
+            raise PermissionDenied("Only users with role 'creator' can create events.")
+
+        # Assign the user to the instance before model validation
+        if self.instance and not self.instance.pk:
+            self.instance.created_by = self.user
+
+        return super().clean()
+
+    def save(self, commit=True):
+        """
+        Save the event with created_by set if not already saved.
+        """
+        event = super().save(commit=False)
+        if self.user and not event.created_by_id:
+            event.created_by = self.user
+        if commit:
+            event.save()
+        return event
