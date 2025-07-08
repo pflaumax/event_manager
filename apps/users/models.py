@@ -61,6 +61,7 @@ class CustomUserManager(BaseUserManager):
             CustomUser: The created superuser instance
         """
         user = self.create_user(email, username, password, role="creator")
+        user.is_active = True
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
