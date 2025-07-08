@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load widget_tweaks %}
+
 {% block title %}Edit Event - Event Manager{% endblock %}
 
 {% block content %}
@@ -11,99 +13,72 @@
         <h1 class="mb-3">Edit Event</h1>
         <p class="lead">Update your event information</p>
     </div>
-    
+
     <div class="glass-card">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            
+
+            {{ form.non_field_errors }}
+
             <div class="profile-info">
+
                 <div class="mb-3">
-                    <label for="title" class="form-label">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">
                         <i class="fas fa-heading"></i> Event Title
                     </label>
-                    <input type="text" class="form-control" id="title" name="title" value="{{ event.title }}" required>
+                    {{ form.title|add_class:"form-control" }}
+                    {{ form.title.errors }}
                 </div>
-                
+
                 <div class="mb-3">
-                    <label for="description" class="form-label">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">
                         <i class="fas fa-align-left"></i> Description
                     </label>
-                    <textarea class="form-control" id="description" name="description" rows="4" required>{{ event.description }}</textarea>
+                    {{ form.description|add_class:"form-control" }}
+                    {{ form.description.errors }}
                 </div>
-                
+
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="date" class="form-label">
+                        <label for="{{ form.date.id_for_label }}" class="form-label">
                             <i class="fas fa-calendar"></i> Date
                         </label>
-                        <input type="date" class="form-control" id="date" name="date" value="{{ event.date|date:'Y-m-d' }}" required>
+                        {{ form.date|add_class:"form-control" }}
+                        {{ form.date.errors }}
                     </div>
-                    
+
                     <div class="col-md-6 mb-3">
-                        <label for="time" class="form-label">
+                        <label for="{{ form.start_time.id_for_label }}" class="form-label">
                             <i class="fas fa-clock"></i> Time
                         </label>
-                        <input type="time" class="form-control" id="time" name="time" value="{{ event.time|time:'H:i' }}" required>
+                        {{ form.start_time|add_class:"form-control" }}
+                        {{ form.start_time.errors }}
                     </div>
                 </div>
-                
+
                 <div class="mb-3">
-                    <label for="location" class="form-label">
+                    <label for="{{ form.location.id_for_label }}" class="form-label">
                         <i class="fas fa-map-marker-alt"></i> Location
                     </label>
-                    <input type="text" class="form-control" id="location" name="location" value="{{ event.location }}" required>
+                    {{ form.location|add_class:"form-control" }}
+                    {{ form.location.errors }}
                 </div>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="category" class="form-label">
-                            <i class="fas fa-tag"></i> Category
-                        </label>
-                        <select class="form-control" id="category" name="category" required>
-                            <option value="">Select Category</option>
-                            <option value="conference" {% if event.category == 'conference' %}selected{% endif %}>Conference</option>
-                            <option value="workshop" {% if event.category == 'workshop' %}selected{% endif %}>Workshop</option>
-                            <option value="seminar" {% if event.category == 'seminar' %}selected{% endif %}>Seminar</option>
-                            <option value="meetup" {% if event.category == 'meetup' %}selected{% endif %}>Meetup</option>
-                            <option value="other" {% if event.category == 'other' %}selected{% endif %}>Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="col-md-6 mb-3">
-                        <label for="max_participants" class="form-label">
-                            <i class="fas fa-users"></i> Maximum Participants
-                        </label>
-                        <input type="number" class="form-control" id="max_participants" name="max_participants" min="1" value="{{ event.max_participants }}" required>
-                    </div>
-                </div>
-                
+
                 <div class="mb-3">
-                    <label for="requirements" class="form-label">
-                        <i class="fas fa-list-check"></i> Requirements (Optional)
+                    <label for="{{ form.image.id_for_label }}" class="form-label">
+                        <i class="fas fa-image"></i> Event Image
                     </label>
-                    <textarea class="form-control" id="requirements" name="requirements" rows="3" placeholder="Any special requirements or notes for participants">{{ event.requirements }}</textarea>
+                    {{ form.image|add_class:"form-control" }}
+                    {{ form.image.errors }}
                 </div>
-                
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="is_public" name="is_public" {% if event.is_public %}checked{% endif %}>
-                        <label class="form-check-label" for="is_public">
-                            <i class="fas fa-globe"></i> Make this event public
-                        </label>
-                    </div>
-                </div>
+
             </div>
-            
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i>
-                <strong>Current Registrations:</strong> {{ event.registrations.count }} out of {{ event.max_participants }} participants
-            </div>
-            
+
             <div class="action-buttons">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Save Changes
                 </button>
-                <a href="{% url 'events:event_detail' event.id %}" class="btn btn-outline-primary">
+                <a href="{% url 'events:event_details' event.id %}" class="btn btn-outline-primary">
                     <i class="fas fa-times"></i> Cancel
                 </a>
             </div>
