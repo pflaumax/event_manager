@@ -38,3 +38,15 @@ class EmailBackend(BaseBackend):
             return None
 
         return None
+
+    def get_user(self, user_id: int) -> Optional[AbstractBaseUser]:
+        """
+        Retrieve user by primary key (user_id).
+
+        :param user_id: ID of the user to retrieve.
+        :return: User object if found, otherwise None.
+        """
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            return None
