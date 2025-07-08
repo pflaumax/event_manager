@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}Cancel Registration - Event Manager{% endblock %}
+{% block title %}Cancel Event - Event Manager{% endblock %}
 
 {% block content %}
 <div class="glass-card">
     <div class="text-center mb-4">
         <div class="feature-icon" style="margin: 0 auto 2rem;">
-            <i class="fas fa-user-times"></i>
+            <i class="fas fa-exclamation-triangle"></i>
         </div>
-        <h1 class="text-danger mb-3">Cancel Registration</h1>
-        <p class="lead">Are you sure you want to cancel your registration for this event?</p>
+        <h1 class="text-danger mb-3">Cancel Event</h1>
+        <p class="lead">Are you sure you want to cancel this event?</p>
     </div>
     
     <div class="glass-card">
@@ -40,35 +40,35 @@
                 </div>
                 <div class="info-content">
                     <div class="info-label">Date & Time</div>
-                    <p class="info-value">{{ event.date|date:"M d, Y" }} at {{ event.time }}</p>
+                    <p class="info-value">{{ event.date|date:"M d, Y" }} at {{ event.start_time }}</p>
                 </div>
             </div>
             
             <div class="info-item">
                 <div class="info-icon">
-                    <i class="fas fa-calendar-check"></i>
+                    <i class="fas fa-users"></i>
                 </div>
                 <div class="info-content">
-                    <div class="info-label">Registration Date</div>
-                    <p class="info-value">{{ registration.registered_at|date:"M d, Y" }}</p>
+                    <div class="info-label">Registered</div>
+                    <p class="info-value">{{ event.registrations.count }} users</p>
                 </div>
             </div>
         </div>
         
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i>
-            You will lose your spot in this event. You can register again later if spots are available.
+        <div class="alert alert-danger">
+            <i class="fas fa-warning"></i>
+            <strong>Warning:</strong> This action cannot be undone. All registered users will be notified of the cancellation.
         </div>
         
         <div class="action-buttons">
             <form method="post" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-times"></i> Yes, Cancel Registration
+                    <i class="fas fa-times"></i> Yes, Cancel Event
                 </button>
             </form>
-            <a href="{% url 'events:my_registrations' %}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left"></i> Keep Registration
+            <a href="{% url 'events:event_details' event.id %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Keep Event
             </a>
         </div>
     </div>
