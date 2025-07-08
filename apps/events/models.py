@@ -95,6 +95,8 @@ class Event(models.Model):
     created_by: models.ForeignKey = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name="created_events",
     )
     created_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
