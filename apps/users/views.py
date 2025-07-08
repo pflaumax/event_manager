@@ -20,18 +20,34 @@ User = get_user_model()
 
 
 def login_view(request: HttpRequest) -> HttpResponse:
+    """
+    Handle user login via email and password.
+
+    If the request method is POST, attempts to authenticate the user
+    using the provided email and password. If authentication is successful,
+    the user is logged in and redirected to the index page. If authentication fails,
+    an error message is displayed.
+
+    For GET requests, renders the login page.
+    Args:
+        request (HttpRequest): The incoming HTTP request object.
+    Returns:
+        HttpResponse: A redirect to the index page on successful login,
+                      or a rendered login page on GET request or failed login.
+    """
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
+
         user = authenticate(request, email=email, password=password)
 
         if user is not None:
             login(request, user)
-            return redirect("home")
+            return redirect("index")
         else:
             messages.error(request, "Invalid email or password")
 
-    return render(request, "users/login.html")
+    return render(request, "registration/login.html")
 
 
 def signup(request: HttpRequest) -> HttpResponse:
