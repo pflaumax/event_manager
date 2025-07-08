@@ -13,7 +13,7 @@
     </div>
     
     <div class="glass-card">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             
             <div class="profile-info">
@@ -30,6 +30,13 @@
                     </label>
                     <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
                 </div>
+
+                  <div class="mb-3">
+                    <label for="image" class="form-label">
+                    <i class="fas fa-image"></i> Event Image
+                    </label>
+                    <input type="file" class="form-control" id="image" name="image">
+                </div>
                 
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -40,10 +47,10 @@
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label for="time" class="form-label">
+                        <label for="start_time" class="form-label">
                             <i class="fas fa-clock"></i> Time
                         </label>
-                        <input type="time" class="form-control" id="time" name="time" required>
+                        <input type="time" class="form-control" id="start_time" name="start_time" required>
                     </div>
                 </div>
                 
@@ -54,44 +61,6 @@
                     <input type="text" class="form-control" id="location" name="location" required>
                 </div>
                 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="category" class="form-label">
-                            <i class="fas fa-tag"></i> Category
-                        </label>
-                        <select class="form-control" id="category" name="category" required>
-                            <option value="">Select Category</option>
-                            <option value="conference">Conference</option>
-                            <option value="workshop">Workshop</option>
-                            <option value="seminar">Seminar</option>
-                            <option value="meetup">Meetup</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="col-md-6 mb-3">
-                        <label for="max_participants" class="form-label">
-                            <i class="fas fa-users"></i> Maximum Participants
-                        </label>
-                        <input type="number" class="form-control" id="max_participants" name="max_participants" min="1" required>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="requirements" class="form-label">
-                        <i class="fas fa-list-check"></i> Requirements (Optional)
-                    </label>
-                    <textarea class="form-control" id="requirements" name="requirements" rows="3" placeholder="Any special requirements or notes for participants"></textarea>
-                </div>
-                
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="is_public" name="is_public" checked>
-                        <label class="form-check-label" for="is_public">
-                            <i class="fas fa-globe"></i> Make this event public
-                        </label>
-                    </div>
-                </div>
             </div>
             
             <div class="action-buttons">
