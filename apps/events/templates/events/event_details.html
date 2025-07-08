@@ -95,7 +95,7 @@
                 </a>
                 {% if not event.is_cancelled %}
                     <a href="{% url 'events:cancel_event' event.id %}" class="btn btn-outline-danger">
-                        <i class="fas fa-user-times"></i> Cancel Event
+                        <i class="fas fa-exclamation-triangle"></i> Cancel Event
                     </a>
                 {% endif %}
             {% else %}
@@ -110,8 +110,8 @@
                 {% endif %}
             {% endif %}
             
-            <a href="{% url 'events:browse_events' %}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left"></i> Back to Events
+            <a href="{% url 'events:my_events' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back
             </a>
         </div>
     </div>
