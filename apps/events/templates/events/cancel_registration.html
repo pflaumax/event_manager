@@ -40,19 +40,10 @@
                 </div>
                 <div class="info-content">
                     <div class="info-label">Date & Time</div>
-                    <p class="info-value">{{ event.date|date:"M d, Y" }} at {{ event.time }}</p>
+                    <p class="info-value">{{ event.date|date:"d M, Y" }} at {{ event.start_time|time:"H:i" }}</p>
                 </div>
             </div>
             
-            <div class="info-item">
-                <div class="info-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="info-content">
-                    <div class="info-label">Registration Date</div>
-                    <p class="info-value">{{ registration.registered_at|date:"M d, Y" }}</p>
-                </div>
-            </div>
         </div>
         
         <div class="alert alert-info">
