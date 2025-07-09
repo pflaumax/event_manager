@@ -39,7 +39,7 @@
             </p>
             
             <p class="text-muted mb-2">
-                <i class="fas fa-clock"></i> {{ event.date|date:"M d, Y" }} at {{ event.start_time }}
+                <i class="fas fa-clock"></i> {{ event.date|date:"d M, Y" }} at {{ event.start_time|time:"H:i" }}
             </p>
             
             <p class="text-muted mb-3">
