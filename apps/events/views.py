@@ -108,11 +108,14 @@ def event_details(
     if hasattr(event, "registrations"):
         registration = event.registrations.filter(user=request.user).first()  # type: ignore
 
+    is_registered = registration is not None
+
     context = {
         "event": event,
         "can_register": can_register,
         "register_message": message,
         "registration": registration,
+        "is_registered": is_registered,
     }
     return render(request, "events/event_details.html", context)
 
