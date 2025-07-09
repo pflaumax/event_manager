@@ -9,37 +9,40 @@
     </h1>
     
     <!-- Search and Filter Section -->
-    <div class="glass-card">
-        <form method="get" class="mb-4">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <form method="get" style="margin-top: 1em;">
-                        <input type="hidden" name="status" value="{{ status }}">
-
-                        <label for="q">Search by name:</label>
-                        <input type="text" id="q" name="q" value="{{ search_query }}" placeholder="Event title...">
-                        <br/>
-                        <label for="date">Filter by date:</label>
-                        <input type="date" id="date" name="date" value="{{ event_date }}">
-
-                        <button type="submit">Search</button>
-                        <a href="{% url 'events:browse_events' %}">Reset Filters</a>
-                    </form>
-                </div>
+    <div class="glass-card p-4 mb-4">
+        <form method="get">
+            <div class="row align-items-end">
+                <!-- Search by Name -->
                 <div class="col-md-4 mb-3">
-                    <form method="get">
-                        <label for="status">Filter by status:</label>
-                        <select name="status" id="status" onchange="this.form.submit()">
+                    <label for="q" class="form-label">Search by name:</label>
+                    <input type="text" id="q" name="q" class="form-control"
+                        placeholder="Event title..." value="{{ search_query }}">
+                </div>
+
+                <!-- Filter by Date -->
+                <div class="col-md-3 mb-3">
+                    <label for="date" class="form-label">Filter by date:</label>
+                    <input type="date" id="date" name="date" class="form-control" value="{{ event_date }}">
+                </div>
+
+                <!-- Filter by Status -->
+                <div class="col-md-3 mb-3">
+                    <label for="status" class="form-label">Filter by status:</label>
+                    <select name="status" id="status" class="form-select" onchange="this.form.submit()">
                         <option value="published" {% if status == "published" %}selected{% endif %}>Published</option>
                         <option value="completed" {% if status == "completed" %}selected{% endif %}>Completed</option>
                         <option value="cancelled" {% if status == "cancelled" %}selected{% endif %}>Cancelled</option>
-                        </select>
-                    </form>
+                    </select>
                 </div>
-                <div class="col-md-2 mb-3">
+
+                <!-- Buttons -->
+                <div class="col-md-2 mb-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-search"></i> Search
                     </button>
+                    <a href="{% url 'events:browse_events' %}" class="btn btn-outline-secondary w-100">
+                        Reset
+                    </a>
                 </div>
             </div>
         </form>
@@ -57,16 +60,19 @@
                 <i class="fas fa-map-marker-alt"></i> {{ event.location }}
             </p>
             <p class="text-muted mb-2">
-                <i class="fas fa-clock"></i> {{ event.date|date:"M d, Y" }} {{ event.time }}
+                <i class="fas fa-clock"></i> {{ event.date|date:"d M, Y" }} {{ event.start_time|time:"H:i" }}
             </p>
             <p class="mb-3">{{ event.description|truncatewords:20 }}</p>
             <div class="action-buttons">
                 <a href="{% url 'events:event_details' event.id %}" class="btn btn-primary">
                     <i class="fas fa-info-circle"></i> Details
                 </a>
+
+                {% if not event.is_cancelled and not event.is_past %}
                 <a href="{% url 'events:register_for_event' event.id %}" class="btn btn-outline-primary">
                     <i class="fas fa-user-plus"></i> Register
                 </a>
+                {% endif %}
             </div>
         </div>
         {% empty %}
