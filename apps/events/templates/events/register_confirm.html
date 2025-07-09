@@ -50,42 +50,9 @@
                 </div>
                 <div class="info-content">
                     <div class="info-label">Date & Time</div>
-                    <p class="info-value">{{ event.date|date:"F d, Y" }} at {{ event.time }}</p>
+                    <p class="info-value">{{ event.date|date:"d M, Y" }} at {{ event.start_time|time:"H:i" }}</p>
                 </div>
             </div>
-            
-            <div class="info-item">
-                <div class="info-icon">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="info-content">
-                    <div class="info-label">Event Creator</div>
-                    <p class="info-value">{{ event.creator.first_name }} {{ event.creator.last_name }}</p>
-                </div>
-            </div>
-            
-            <div class="info-item">
-                <div class="info-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="info-content">
-                    <div class="info-label">Available Spots</div>
-                    <p class="info-value">{{ available_spots }} out of {{ event.max_participants }} spots remaining</p>
-                </div>
-            </div>
-            
-            {% if event.requirements %}
-            <div class="info-item">
-                <div class="info-icon">
-                    <i class="fas fa-list-check"></i>
-                </div>
-                <div class="info-content">
-                    <div class="info-label">Requirements</div>
-                    <p class="info-value">{{ event.requirements }}</p>
-                </div>
-            </div>
-            {% endif %}
-        </div>
         
         <div class="alert alert-success">
             <i class="fas fa-check-circle"></i>
