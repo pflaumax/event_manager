@@ -212,7 +212,6 @@ class Event(models.Model):
             raise ValueError("Only published events can be cancelled.")
 
         self.status = "cancelled"
-        self._cancel_all_registrations()
         self.save()
 
     def _cancel_all_registrations(self) -> None:
@@ -220,9 +219,9 @@ class Event(models.Model):
         Cancel all active registrations for cancelled event.
         Private method to handle registration cancellation when an event is cancelled.
         """
-        self.registrations.filter(status="registered").update(  # type: ignore
-            status="cancelled", updated_at=timezone.now()
-        )
+        active_regs = self.registrations.filter(status="registered")  # type: ignore
+        print(f"Cancelling {active_regs.count()} registrations for event {self.id}")  # type: ignore
+        active_regs.update(status="cancelled", updated_at=timezone.now())
 
     def can_register(self, user) -> Tuple[bool, str]:
         """
@@ -286,6 +285,15 @@ class Event(models.Model):
             bool: True if event status is 'published'.
         """
         return self.status == "published"
+
+    @property
+    def is_cancelled(self) -> bool:
+        """
+        Check if event is cancelled.
+        Returns:
+            bool: True if event status is 'cancelled'.
+        """
+        return self.status == "cancelled"
 
 
 class EventRegistration(models.Model):
