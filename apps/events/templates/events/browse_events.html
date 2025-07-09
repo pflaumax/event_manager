@@ -50,7 +50,7 @@
     
     <!-- Events Grid -->
     <div class="features-grid">
-        {% for event in events %}
+        {% for event, can_register in events_with_flags %}
         <div class="feature-card">
             <div class="feature-icon">
                 <i class="fas fa-calendar-check"></i>
@@ -69,9 +69,15 @@
                 </a>
 
                 {% if not event.is_cancelled and not event.is_past %}
-                <a href="{% url 'events:register_for_event' event.id %}" class="btn btn-outline-primary">
-                    <i class="fas fa-user-plus"></i> Register
-                </a>
+                    {% if can_register %}
+                        <a href="{% url 'events:register_for_event' event.id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    {% else %}
+                        <span class="btn btn-outline-primary no-border">
+                            <i class="fas fa-check-circle text-success"></i> Registered
+                        </span>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
