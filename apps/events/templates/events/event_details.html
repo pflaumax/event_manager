@@ -29,7 +29,7 @@
                 </div>
                 <div class="info-content">
                     <div class="info-label">Date</div>
-                    <p class="info-value">{{ event.date|date:"F d, Y" }}</p>
+                    <p class="info-value">{{ event.date|date:"d M, Y" }}</p>
                 </div>
             </div>
             
@@ -39,7 +39,7 @@
                 </div>
                 <div class="info-content">
                     <div class="info-label">Time</div>
-                    <p class="info-value">{{ event.start_time }}</p>
+                    <p class="info-value">{{ event.start_time|time:"H:i" }}</p>
                 </div>
             </div>
             
@@ -98,21 +98,26 @@
                         <i class="fas fa-exclamation-triangle"></i> Cancel Event
                     </a>
                 {% endif %}
-            {% else %}
+                <a href="{% url 'events:my_events' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+
+            {% elif user.is_visitor %}
                 <!-- Visitor Actions -->
-                {% if user.is_visitor %}
+                {% if not is_registered %}
+                    <a href="{% url 'events:register_for_event' event.id %}" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                {% else %}
                     <a href="{% url 'events:cancel_registration' event.id %}" class="btn btn-outline-danger">
                         <i class="fas fa-user-times"></i> Cancel Registration
                     </a>
-                    <a href="{% url 'events:register_confirm' event.id %}" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> Register
-                    </a>
                 {% endif %}
+
+                <a href="{% url 'events:browse_events' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
             {% endif %}
-            
-            <a href="{% url 'events:my_events' %}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left"></i> Back
-            </a>
         </div>
     </div>
 </div>
