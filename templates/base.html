@@ -79,7 +79,11 @@
                 <div class="footer-section">
                     <h6>Quick Links</h6>
                     {% if user.is_authenticated %}
-                        <a href="{% url 'events:browse_events' %}">Events</a>
+                        {% if user.is_visitor %}
+                            <a href="{% url 'events:browse_events' %}">Browse Events</a>
+                        {% elif user.is_creator %}
+                            <a href="{% url 'events:my_events' %}">My Events</a>
+                        {% endif %}
                         <a href="{% url 'home' %}">Profile</a>
                     {% else %}
                         <a href="{% url 'index' %}">Home</a>
