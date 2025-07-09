@@ -277,7 +277,14 @@ def browse_events(request: HttpRequest) -> HttpResponse:
     if event_date:
         events = events.filter(date=event_date)
 
+    # Annotate events with can_register
+    events_with_flags = []
+    for event in events:
+        can_register, _ = event.can_register(request.user)
+        events_with_flags.append((event, can_register))
+
     context = {
+        "events_with_flags": events_with_flags,
         "events": events,
         "status": status,
         "search_query": search_query,
