@@ -34,11 +34,11 @@
             </p>
             
             <p class="text-muted mb-2">
-                <i class="fas fa-clock"></i> {{ registration.event.date|date:"M d, Y" }} at {{ registration.event.time }}
+                <i class="fas fa-clock"></i> {{ registration.event.date|date:"d M, Y" }} at {{ registration.event.start_time|time:"H:i" }}
             </p>
             
             <p class="text-muted mb-3">
-                <i class="fas fa-calendar-plus"></i> Registered: {{ registration.registered_at|date:"M d, Y" }}
+                <i class="fas fa-calendar-plus"></i> You registered: {{ registration.registered_at|date:"M d, Y" }}
             </p>
             
             <!-- Status Badge -->
@@ -47,18 +47,15 @@
             {% elif registration.event.is_past %}
                 <span class="role-badge" style="background: #28a745;">Attended</span>
             {% else %}
-                <span class="role-badge role-visitor">Registered</span>
+                <span class="btn btn-outline-primary no-border">
+                    <i class="fas fa-check-circle text-success"></i> Registered
+                </span>
             {% endif %}
             
-            <div class="action-buttons mt-3">
+            <div class="action-buttons">
                 <a href="{% url 'events:event_details' registration.event.id %}" class="btn btn-primary">
-                    <i class="fas fa-eye"></i> View Event
+                    <i class="fas fa-info-circle"></i> Details
                 </a>
-                {% if not registration.event.is_cancelled and not registration.event.is_past %}
-                    <a href="{% url 'events:cancel_registration' registration.event.id %}" class="btn btn-outline-danger">
-                        <i class="fas fa-times"></i> Cancel
-                    </a>
-                {% endif %}
             </div>
         </div>
         {% empty %}
@@ -71,14 +68,5 @@
         </div>
         {% endfor %}
     </div>
-    
-    <!-- Browse Events CTA -->
-    {% if registrations %}
-    <div class="text-center mt-4">
-        <a href="{% url 'events:browse_events' %}" class="btn btn-outline-primary">
-            <i class="fas fa-search"></i> Browse More Events
-        </a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
