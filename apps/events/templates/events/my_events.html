@@ -24,7 +24,7 @@
         <div class="feature-card">
             <div class="feature-icon">
                 {% if event.is_cancelled %}
-                    <i class="fas fa-times-circle text-danger"></i>
+                    <i class="fas fa-times-circle"></i>
                 {% elif event.is_past %}
                     <i class="fas fa-clock text-muted"></i>
                 {% else %}
@@ -59,7 +59,7 @@
                 <a href="{% url 'events:event_details' event.id %}" class="btn btn-primary">
                     <i class="fas fa-eye"></i> View
                 </a>
-                {% if not event.is_cancelled %}
+                {% if event.can_be_cancelled %}
                     <a href="{% url 'events:edit_event' event.id %}" class="btn btn-outline-primary">
                         <i class="fas fa-edit"></i> Edit
                     </a>
@@ -67,12 +67,6 @@
             </div>
         </div>
         {% empty %}
-        <div class="text-center">
-            <p class="text-muted">You haven't created any events yet.</p>
-            <a href="{% url 'events:new_event' %}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Create Your First Event
-            </a>
-        </div>
         {% endfor %}
     </div>
 </div>
