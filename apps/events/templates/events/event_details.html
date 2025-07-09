@@ -93,7 +93,7 @@
                 <a href="{% url 'events:edit_event' event.id %}" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Edit Event
                 </a>
-                {% if not event.is_cancelled %}
+                {% if not event.is_cancelled and not event.is_past %}
                     <a href="{% url 'events:cancel_event' event.id %}" class="btn btn-outline-danger">
                         <i class="fas fa-exclamation-triangle"></i> Cancel Event
                     </a>
