@@ -91,7 +91,7 @@
             {% if user.is_creator %}
                 <!-- Creator Actions -->
                 <a href="{% url 'events:edit_event' event.id %}" class="btn btn-primary">
-                    <i class="fas fa-edit"></i> Edit Event
+                    <i class="fas fa-edit"></i> Edit
                 </a>
                 {% if not event.is_cancelled and not event.is_past %}
                     <a href="{% url 'events:cancel_event' event.id %}" class="btn btn-outline-danger">
@@ -108,7 +108,7 @@
                     <a href="{% url 'events:register_for_event' event.id %}" class="btn btn-primary">
                         <i class="fas fa-user-plus"></i> Register
                     </a>
-                {% elif is_registered %}
+                {% elif is_registered and not event.is_past and not event.is_cancelled%}
                     <a href="{% url 'events:cancel_registration' event.id %}" class="btn btn-outline-danger">
                         <i class="fas fa-user-times"></i> Cancel Registration
                     </a>
