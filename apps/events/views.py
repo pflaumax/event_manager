@@ -106,7 +106,7 @@ def event_details(
 
     registration: Optional[EventRegistration] = None
     if hasattr(event, "registrations"):
-        registration = event.registrations.filter(user=request.user, status="published").first()  # type: ignore
+        registration = event.registrations.filter(user=request.user, status="registered").first()  # type: ignore
 
     is_registered = registration is not None
 
