@@ -318,19 +318,34 @@ def register_for_event(
         return redirect("events:event_details", event_id=event_id)
 
     if request.method == "POST":
-        # Create registration
-        registration: EventRegistration = EventRegistration.objects.create(
-            event=event, user=request.user, status="registered"
-        )
+        # Check for existing registration
+        registration: Optional[EventRegistration] = EventRegistration.objects.filter(
+            user=request.user,
+            event=event,
+        ).first()
 
-        # Send confirmation email to the user
+        if registration:
+            if registration.status == "cancelled":
+                # Re-activate cancelled registration
+                registration.status = "registered"
+                registration.save()
+                messages.success(request, "You have re-registered for this event.")
+            else:
+                messages.warning(request, "You are already registered for this event.")
+                return redirect("events:event_details", event_id=event_id)
+        else:
+            # Create new registration
+            registration = EventRegistration.objects.create(
+                event=event, user=request.user, status="registered"
+            )
+            messages.success(request, "Successfully registered!")
+
+        # Send confirmation email
         try:
             send_event_registration_email(request, registration)
         except Exception as e:
-            # If email fails, log it but don't break the registration
             print(f"Failed to send registration email: {e}")
 
-        messages.success(request, "Successfully registered!")
         return redirect("events:event_details", event_id=event_id)
 
     # Show confirmation page
