@@ -362,7 +362,9 @@ def my_registrations(request: HttpRequest) -> HttpResponse:
         HttpResponse: Rendered template with user's registrations.
     """
     registrations: QuerySet[EventRegistration] = (
-        EventRegistration.objects.filter(user=request.user, status="registered")
+        EventRegistration.objects.filter(
+            user=request.user, status__in=["registered", "cancelled"]
+        )
         .select_related("event")
         .order_by("event__date")
     )
