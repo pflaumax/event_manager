@@ -182,6 +182,13 @@ class Event(models.Model):
         # Validate before saving
         self.full_clean()
 
+        # If event is not cancelled, update status according to date
+        if self.status != "cancelled":
+            if self.is_past:
+                self.status = "completed"
+            elif self.is_upcoming:
+                self.status = "published"
+
         # Get previous status for comparison
         previous_status = None
         if self.pk:
