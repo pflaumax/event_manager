@@ -19,11 +19,11 @@
         <div class="feature-card">
             <div class="feature-icon">
                 {% if registration.event.is_cancelled %}
-                    <i class="fas fa-times-circle text-danger"></i>
+                    <i class="fas fa-times-circle"></i>
                 {% elif registration.event.is_past %}
-                    <i class="fas fa-check-circle text-success"></i>
+                    <i class="fas fa-check-circle"></i>
                 {% else %}
-                    <i class="fas fa-calendar-check text-primary"></i>
+                    <i class="fas fa-calendar-check"></i>
                 {% endif %}
             </div>
             
@@ -44,12 +44,12 @@
             <!-- Status Badge -->
             {% if registration.event.is_cancelled %}
                 <span class="role-badge" style="background: #dc3545;">Event Cancelled</span>
+            {% elif registration.status == 'cancelled' %}
+                <span class="role-badge" style="background: #ffc107;">Registration Cancelled</span>
             {% elif registration.event.is_past %}
-                <span class="role-badge" style="background: #28a745;">Attended</span>
+                <span class="role-badge" style="background: #6c757d;">Attended</span>
             {% else %}
-                <span class="btn btn-outline-primary no-border">
-                    <i class="fas fa-check-circle text-success"></i> Registered
-                </span>
+                <span class="role-badge" style="background: #28a745;">Registered</span>
             {% endif %}
             
             <div class="action-buttons">
