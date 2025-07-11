@@ -1,0 +1,19 @@
+Hello {{ user.username }},
+
+We regret to inform you that the event "{{ event.title }}" has been cancelled by the organizer, and your registration has been deactivated.
+
+Event Details:
+Event: {{ event.title }}
+Date: {{ event.date|date:"d M, Y" }}
+Time: {{ event.start_time|time:"H:i" }}
+Location: {{ event.location }}
+
+Your Registration:
+Status: Automatically Cancelled
+Originally registered: {{ registration.registered_at|date:"d M, Y H:i" }}
+
+We apologize for any inconvenience this may cause.
+
+You can browse other upcoming events on our platform that might interest you.
+
+Best regards!
