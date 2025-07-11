@@ -91,6 +91,7 @@ pgdata/
 postgres-data/
 data/postgres/
 
+# Temporary dev files
 settings_config.py
 с_mail.html
 ref.py
