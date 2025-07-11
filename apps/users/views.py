@@ -78,6 +78,11 @@ def signup(request: HttpRequest) -> HttpResponse:
                 "Registration successful! Please check your email to activate your account.",
             )
             return render(request, "index.html")
+        else:
+            # If form is invalid show error
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         # Display a blank registration form
         form = CustomUserSignupForm()
