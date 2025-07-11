@@ -87,24 +87,5 @@
         </div>
         {% endfor %}
     </div>
-    
-    <!-- Pagination -->
-    {% if is_paginated %}
-    <div class="text-center mt-4">
-        <div class="pagination">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-primary">Previous</a>
-            {% endif %}
-            
-            <span class="btn btn-primary">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-            </span>
-            
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-primary">Next</a>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}
