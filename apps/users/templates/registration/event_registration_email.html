@@ -16,6 +16,12 @@
         <p><strong>Time:</strong> {{ event.start_time|time:"H:i" }}</p>
         <p><strong>Location:</strong> {{ event.location }}</p>
     </div>
+
+    <div class="event-details">
+        <h3>Your Registration</h3>
+        <p><strong>Status:</strong> <span class="status-badge status-registered">Registered</span></p>
+        <p><strong>Originally registered:</strong> {{ registration.registered_at|date:"d M, Y H:i" }}</p>
+    </div>
     
     <p>We look forward to seeing you at the event!</p>
     
