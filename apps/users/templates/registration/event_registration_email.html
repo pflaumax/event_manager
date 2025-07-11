@@ -1,17 +1,25 @@
-Dear {{ user.first_name|default:user.username }},
-        
-<p>You have successfully registered for the following event: {{ event.title }}</p>
+{% extends 'base_email.html' %}
 
-<p><>Event Description:</p>
-<p>{{ event.description|linebreaks }}</p>
+{% block title %}Registration Confirmed - {{ event.title }}{% endblock %}
 
-<p>Registration Details:</p>
-<p>Registration Date: {{ registration.registered_at|date:"F d, Y g:i A" }}</p>
-<p>Status: {{ registration.status|title }}</p>
+{% block header %}Registration Confirmed!{% endblock %}
 
-<p>We look forward to seeing you at the event!</p>
+{% block content %}
+    <h2>Hello {{ user.username }}!</h2>
+    
+    <p>Your registration for <strong>{{ event.title }}</strong> has been confirmed!</p>
+    
+    <div class="event-details">
+        <h3>Event Details</h3>
+        <p><strong>Event:</strong> {{ event.title }}</p>
+        <p><strong>Date:</strong> {{ event.date|date:"d M, Y" }}</p>
+        <p><strong>Time:</strong> {{ event.start_time|time:"H:i" }}</p>
+        <p><strong>Location:</strong> {{ event.location }}</p>
+    </div>
+    
+    <p>We look forward to seeing you at the event!</p>
+    
+    <p>If you need to cancel your registration, please do so at least 24 hours before the event in your cabinet.</p>
 
-<p>If you need to cancel your registration, please log in to your account at 
-  <a href="http://{{ domain }}">{{ domain }}</a>
-</p>
-        
+    <p>Best regards!</p>
+{% endblock %}
