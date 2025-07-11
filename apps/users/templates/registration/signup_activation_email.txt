@@ -1,0 +1,11 @@
+Activate Your Account
+
+Hello {{ user.username }},
+
+Thank you for registering with Event Manager! Please click the link below to activate your account:
+
+http://{{ domain }}{% url 'users:activate' uidb64=uid token=token %}
+
+If you did not create this account, please ignore this email.
+
+We look forward to having you with us!

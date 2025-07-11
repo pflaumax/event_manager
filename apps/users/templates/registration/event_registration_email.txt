@@ -1,0 +1,15 @@
+Hello {{ user.username }}!
+
+Your registration for "{{ event.title }}" has been confirmed!
+
+Event Details:
+Event: {{ event.title }}
+Date: {{ event.date|date:"d M, Y" }}
+Time: {{ event.start_time|time:"H:i" }}
+Location: {{ event.location }}
+
+We look forward to seeing you at the event!
+
+If you need to cancel your registration, please do so at least 24 hours before the event in your cabinet.
+
+Best regards!
