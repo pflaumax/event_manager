@@ -1,5 +1,17 @@
-Hi {{ user.email }},
+{% extends 'base_email.html' %}
 
-Please click the link below to activate your account:
+{% block title %}Activate Your Account{% endblock %}
 
-http://{{ domain }}{% url 'users:activate' uidb64=uid token=token %}
+{% block header %}Activate Your Account{% endblock %}
+
+{% block content %}
+    <p>Hello {{ user.username }},</p>
+
+    <p>Thank you for registering with Event Manager! Please click the link below to activate your account:</p>
+
+    <p><a href="http://{{ domain }}{% url 'users:activate' uidb64=uid token=token %}">Activate My Account</a></p>
+
+    <p>If you did not create this account, please ignore this email.</p>
+
+    <p>We look forward to having you with us!</p>
+{% endblock %}
