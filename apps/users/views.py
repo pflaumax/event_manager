@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail, send_mass_mail
+from django.core.mail import send_mail, send_mass_mail, EmailMultiAlternatives
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -135,21 +135,29 @@ def send_activation_email(request: HttpRequest, user: CustomUser) -> None:
     """
     current_site = get_current_site(request)
     subject = "Please activate your account"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
+    to_email = [user.email]
 
-    # Create the email message from template
-    message = render_to_string(
-        "registration/signup_activation_email.html",
-        {
-            "user": user,
-            "domain": current_site.domain,
-            "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-            "token": default_token_generator.make_token(user),
-        },
+    # Context for template
+    context = {
+        "user": user,
+        "domain": current_site.domain,
+        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+        "token": default_token_generator.make_token(user),
+    }
+
+    # Text and HTML versions
+    text_content = render_to_string("registration/signup_activation_email.txt", context)
+    html_content = render_to_string(
+        "registration/signup_activation_email.html", context
     )
 
+    # Create email object
+    email = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+    email.attach_alternative(html_content, "text/html")
+
     # Send the email
-    from_email: Optional[str] = getattr(settings, "DEFAULT_FROM_EMAIL", None)
-    send_mail(subject, message, from_email, [user.email])
+    email.send()
 
 
 def get_user_from_token(uidb64: str) -> Optional[CustomUser]:
@@ -184,24 +192,32 @@ def send_event_registration_email(
     current_site = get_current_site(request)
     user: CustomUser = registration.user
     event: Event = registration.event
-
     subject = f"Registration Confirmed: {event.title}"
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None)
+    to_email = [user.email]
 
-    # Create email content from template
-    message = render_to_string(
-        "registration/event_registration_email.html",
-        {
-            "user": user,
-            "event": event,
-            "registration": registration,
-            "domain": current_site.domain,
-        },
+    # Context for template
+    context = {
+        "user": user,
+        "event": event,
+        "registration": registration,
+        "domain": current_site.domain,
+    }
+
+    # Text and HTML versions
+    text_content = render_to_string(
+        "registration/event_registration_email.txt", context
+    )
+    html_content = render_to_string(
+        "registration/event_registration_email.html", context
     )
 
+    email = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+    email.attach_alternative(html_content, "text/html")
+
     # Send the email
-    from_email: Optional[str] = getattr(settings, "DEFAULT_FROM_EMAIL", None)
     try:
-        send_mail(subject, message, from_email, [user.email])
+        email.send()
         print(f"Registration email sent to {user.email}")
     except Exception as e:
         print(f"Failed to send registration email to {user.email}: {e}")
@@ -223,32 +239,34 @@ def send_event_cancellation_emails(
     current_site = get_current_site(request)
     from_email: Optional[str] = getattr(settings, "DEFAULT_FROM_EMAIL", None)
 
-    # Prepare email data for mass sending
-    email_messages = []
-
     for registration in registrations:
-        user: CustomUser = registration.user
+        user = registration.user
         subject = f"Event Cancelled: {event.title}"
+        to_email = [user.email]
 
-        # Create email content from template
-        message = render_to_string(
-            "registration/event_cancellation_email.html",
-            {
-                "user": user,
-                "event": event,
-                "registration": registration,
-                "domain": current_site.domain,
-            },
+        # Context for template
+        context = {
+            "user": user,
+            "event": event,
+            "registration": registration,
+            "domain": current_site.domain,
+        }
+
+        # Text and HTML versions
+        text_content = render_to_string(
+            "registration/event_cancellation_email.txt", context
+        )
+        html_content = render_to_string(
+            "registration/event_cancellation_email.html", context
         )
 
-        # Add to email batch
-        email_messages.append((subject, message, from_email, [user.email]))
+        email = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+        email.attach_alternative(html_content, "text/html")
 
-    # Send all emails at once
-    if email_messages:
+        # Send the email
         try:
-            send_mass_mail(email_messages)
-            print(f"Cancellation emails sent to {len(email_messages)} users")
+            email.send()
+            print(f"Cancellation email sent to {user.email}")
         except Exception as e:
-            print(f"Failed to send cancellation emails: {e}")
+            print(f"Failed to send cancellation email to {user.email}: {e}")
             raise
