@@ -35,19 +35,37 @@ def home(request: HttpRequest) -> HttpResponse:
     return render(request, "home.html", {"events": events})
 
 
-def error_404(request: HttpRequest, exception: Exception) -> HttpResponse:
-    """
-    Handle 404 Didn't Find errors with custom error page.
-    This view is called when Django encounters a 404 error and
-    DEBUG is False in settings. Renders a custom 404 error page
-    instead of the default Django 404 page.
-    Args:
-        request: The HTTP request object that caused the 404 error.
-        exception: The exception that was raised (usually Http404).
-    Returns:
-        HttpResponse: Rendered 404.html template with 404 status codes.
-    Note:
-        This view requires DEBUG = False in settings.py to be triggered.
-        For development with DEBUG = True, Django shows its default 404 page.
-    """
-    return render(request, "404.html", status=404)
+"""
+Custom error handlers for HTTP status codes.
+
+This module provides user-friendly error pages for common HTTP error responses.
+Each handler function renders a corresponding HTML template with an appropriate
+HTTP status code.
+
+Handlers:
+- 401 Unauthorized
+- 403 Forbidden
+- 404 Not Found
+- 500 Internal Server Error
+- 503 Service Unavailable
+"""
+
+
+def handler404(request, exception):
+    return render(request, "errors/404.html", status=404)
+
+
+def handler500(request):
+    return render(request, "errors/500.html", status=500)
+
+
+def handler403(request, exception):
+    return render(request, "errors/403.html", status=403)
+
+
+def handler401(request, exception):
+    return render(request, "errors/401.html", status=401)
+
+
+def handler503(request, exception):
+    return render(request, "errors/503.html", status=503)
