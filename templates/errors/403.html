@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="error-container">
+        <div class="error-icon">🔒</div>
+        <div class="error-code">403</div>
+        <h1 class="error-title">Access Forbidden</h1>
+        <p class="error-description">
+            You don't have permission to access this resource.
+        </p>
+        <div class="btn-group">
+            <a href="{% url 'home' %}" class="btn">Go Home</a>
+            <a href="{% url 'users:login' %}" class="btn btn-outline">Login</a>
+        </div>
+    </div>
+{% endblock content %}

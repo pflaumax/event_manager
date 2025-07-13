@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="error-container">
+        <div class="error-icon">🔧</div>
+        <div class="error-code">503</div>
+        <h1 class="error-title">Service Unavailable</h1>
+        <p class="error-description">
+            We're temporarily down for maintenance. Please check back soon.
+        </p>
+        <div class="btn-group">
+            <a href="{% url 'home' %}" class="btn">Go Home</a>
+        </div>
+    </div>
+{% endblock content %}

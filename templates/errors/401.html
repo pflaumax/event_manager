@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="error-container">
+        <div class="error-icon">🚫</div>
+        <div class="error-code">401</div>
+        <h1 class="error-title">Unauthorized</h1>
+        <p class="error-description">
+            You need to log in to access this page.
+        </p>
+        <div class="btn-group">
+            <a href="{% url 'users:login' %}" class="btn">Login</a>
+            <a href="{% url 'users:signup' %}" class="btn btn-outline">Sign Up</a>
+        </div>
+    </div>
+{% endblock content %}
