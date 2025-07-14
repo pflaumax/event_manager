@@ -8,16 +8,20 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     """Serializer for user registration"""
 
     password = serializers.CharField(write_only=True, required=True, min_length=6)
+    is_active = serializers.BooleanField(default=False)
+    username = serializers.CharField(required=True)
 
     class Meta:
         model = CustomUser
-        fields = ["email", "password", "role"]
+        fields = ["email", "username", "password", "role", "is_active"]
 
     def create(self, validated_data: Dict[str, Any]) -> CustomUser:
         """Create new user with hashed password."""
         user = CustomUser(
             email=validated_data["email"],
+            username=validated_data["username"],
             role=validated_data.get("role", "visitor"),
+            is_active=validated_data.get("is_active", False),  # default still False
         )
         user.set_password(validated_data["password"])
         user.save()
@@ -36,7 +40,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     """Serializer for user login"""
 
-    username = serializers.CharField()
+    email = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
 

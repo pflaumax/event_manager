@@ -55,3 +55,18 @@ class IsOwnerOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
         return obj.user == request.user
+
+
+class IsAdminOrReadOnlySelf(BasePermission):
+    """
+    Admin full access
+    Visitor - read only, (GET) own profile
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Admin full access
+        if request.user.is_staff:
+            return True
+
+        # Read-only for visitors
+        return request.method in SAFE_METHODS and obj == request.user

@@ -1,4 +1,5 @@
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from apps.events.permissions import IsAdminOrReadOnlySelf
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
@@ -25,11 +26,23 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         """Return permissions based on action."""
         if self.action in ["create", "register", "login"]:
             return [AllowAny()]
+        elif self.action == "profile":
+            return [IsAuthenticated()]
+        elif self.action in ["retrieve", "update", "partial_update", "destroy", "list"]:
+            return [IsAuthenticated(), IsAdminOrReadOnlySelf()]
         return [IsAuthenticated()]
+
+    def get_queryset(self):
+        """Restrict user list to admin only."""
+        user = self.request.user
+        if user.is_staff:
+            return CustomUser.objects.all()
+        # Visitors cant see other users
+        return CustomUser.objects.none()
 
     def get_serializer_class(self):
         """Return appropriate serializer based on action."""
-        if self.action in ["retrieve", "update", "partial_update", "profile"]:
+        if self.action in ["retrieve", "update", "partial_update", "profile", "list"]:
             return UserProfileSerializer
         elif self.action == "login":
             return LoginSerializer
@@ -59,10 +72,10 @@ class CustomUserViewSet(viewsets.ModelViewSet):
         """Login user and return JWT tokens."""
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            username = serializer.validated_data["username"]
+            email = serializer.validated_data["email"]
             password = serializer.validated_data["password"]
 
-            user = authenticate(username=username, password=password)
+            user = authenticate(email=email, password=password)
             if user:
                 refresh = RefreshToken.for_user(user)
                 return Response(
