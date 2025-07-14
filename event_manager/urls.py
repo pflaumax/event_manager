@@ -34,5 +34,5 @@ handler403 = "event_manager.views.handler403"
 handler401 = "event_manager.views.handler401"
 
 # Service for upload media files (Debug mode)
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
