@@ -26,10 +26,7 @@ build/
 *.pyc
 *.sqlite3
 db.sqlite3
-settings.py
-media/
 staticfiles/
-static/
 
 # Django migrations cache
 */migrations/__pycache__/
