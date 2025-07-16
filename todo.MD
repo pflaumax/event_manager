@@ -85,6 +85,7 @@ Build a basic Django web application where users can:
 - [x] Add Docker support (Dockerfile/docker-compose)
 - [x] Add API DRF(Django REST framework) for all pages and Postman test
 - [x] Add responsive frontend design (bootstrap)
+- [ ] Add export participant lists as CSV files for creators
 - [ ] Deploy to production with Docker and Postgres
 - [ ] Set image upload into production (railway + whitenoise/staticfiles)
 
