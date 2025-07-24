@@ -16,7 +16,7 @@ urlpatterns = [
     path(
         "event/<int:event_id>/export_csv",
         views.export_registrations_csv,
-        name="export_csv",
+        name="export_registrations_csv",
     ),
     # Page for confirmation cancel own created event (creator)
     path(
