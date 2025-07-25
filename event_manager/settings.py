@@ -17,7 +17,8 @@ MESSAGE_TAGS = {
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables
-load_dotenv()
+load_dotenv(dotenv_path=BASE_DIR / "config" / ".env")
+
 
 # Admin URL
 ADMIN_URL = os.getenv("DJANGO_ADMIN_URL")
@@ -110,13 +111,16 @@ WSGI_APPLICATION = "event_manager.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+USE_DOCKER = os.getenv("USE_DOCKER", "False") == "True"
+DB_HOST = "db" if USE_DOCKER else os.getenv("DB_HOST", "localhost")
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST", "db"),
+        "HOST": DB_HOST,
         "PORT": os.getenv("DB_PORT", "5432"),
     }
 }
