@@ -90,33 +90,40 @@
         <div class="action-buttons">
             {% if user.is_creator %}
                 <!-- Creator Actions -->
-                <a href="{% url 'events:edit_event' event.id %}" class="btn btn-primary">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
-                {% if not event.is_cancelled and not event.is_past %}
-                    <a href="{% url 'events:cancel_event' event.id %}" class="btn btn-outline-danger">
-                        <i class="fas fa-exclamation-triangle"></i> Cancel Event
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    <a href="{% url 'events:edit_event' event.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit
                     </a>
-                {% endif %}
-                <a href="{% url 'events:my_events' %}" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
+                    <a href="{% url 'events:export_registrations_csv' event.id %}" class="btn btn-outline-success">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </a>
+                    {% if not event.is_cancelled and not event.is_past %}
+                        <a href="{% url 'events:cancel_event' event.id %}" class="btn btn-outline-danger">
+                            <i class="fas fa-times"></i> Cancel event
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'events:my_events' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
 
             {% elif user.is_visitor %}
                 <!-- Visitor Actions -->
-                {% if not is_registered and not event.is_cancelled and not event.is_past %}
-                    <a href="{% url 'events:register_for_event' event.id %}" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> Register
-                    </a>
-                {% elif is_registered and not event.is_past and not event.is_cancelled%}
-                    <a href="{% url 'events:cancel_registration' event.id %}" class="btn btn-outline-danger">
-                        <i class="fas fa-user-times"></i> Cancel Registration
-                    </a>
-                {% endif %}
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    {% if not is_registered and not event.is_cancelled and not event.is_past %}
+                        <a href="{% url 'events:register_for_event' event.id %}" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    {% elif is_registered and not event.is_past and not event.is_cancelled%}
+                        <a href="{% url 'events:cancel_registration' event.id %}" class="btn btn-outline-danger">
+                            <i class="fas fa-user-times"></i> Cancel registration
+                        </a>
+                    {% endif %}
 
-                <a href="{% url 'events:browse_events' %}" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
+                    <a href="{% url 'events:browse_events' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
             {% endif %}
         </div>
     </div>
