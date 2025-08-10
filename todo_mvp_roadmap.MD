@@ -91,4 +91,5 @@ Build a basic Django web application where users can:
 
 ## After all: ideas to add
 
+- [ ] Add support AI chatbot (OpenAI API, WebSocket)
 - [ ] Implement API payment gateway (PayPal)
