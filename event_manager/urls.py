@@ -16,6 +16,8 @@ urlpatterns = [
     # Welcome page
     path("", views.index, name="index"),
     path("home/", views.home, name="home"),
+    # OAuth URLs
+    path("accounts/", include("allauth.urls")),
     # API URLs
     path("", include("apps.users.urls_api")),  # /api/users/
     path("", include("apps.events.urls_api")),  # /api/events/, /api/registrations/
