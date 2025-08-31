@@ -87,3 +87,5 @@ Dockerfile.*
 pgdata/
 postgres-data/
 data/postgres/
+!/nginx/
+!/scripts/backup_pg.sh
