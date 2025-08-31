@@ -66,31 +66,6 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    @classmethod
-    def create_from_social_account(cls, social_account):
-        """
-        Create user from social account (Google OAuth).
-        """
-        email = social_account.extra_data.get('email')
-        name = social_account.extra_data.get('name', '')
-
-        # Generate username from email or name
-        username = email.split('@')[0] if email else name.replace(' ', '').lower()
-
-        base_username = username
-        counter = 1
-        while CustomUser.objects.filter(username=username).exists():
-            username = f"{base_username}{counter}"
-            counter += 1
-
-        user = CustomUser.objects.create(
-            email=email,
-            username=username,
-            role='visitor',
-            is_active=True,  # Google OAuth users are active by default
-        )
-        return user
-
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     """

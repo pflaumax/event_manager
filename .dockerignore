@@ -2,7 +2,7 @@ __pycache__
 *.pyc
 *.pyo
 *.pyd
-.env
+.env.docker.dev
 *.sqlite3
 *.log
 *.db

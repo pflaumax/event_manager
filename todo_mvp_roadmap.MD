@@ -91,5 +91,5 @@ Build a basic Django web application where users can:
 
 ## After all: ideas to add
 
-- [ ] Add OAuth2.0 for user registration and login (Google, GitHub)
+- [x] Add OAuth2.0 for user registration and login (Google, GitHub)
 - [ ] Add support AI chatbot (OpenAI API, WebSocket)

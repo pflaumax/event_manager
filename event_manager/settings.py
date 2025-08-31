@@ -17,7 +17,7 @@ MESSAGE_TAGS = {
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables
-load_dotenv(dotenv_path=BASE_DIR / ".env")
+load_dotenv(dotenv_path=BASE_DIR / ".env.docker.dev")
 
 
 # Admin URL
@@ -243,13 +243,16 @@ AUTHENTICATION_BACKENDS = [
 # Allauth settings
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # Для звичайної реєстрації
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https" if not DEBUG else "http"
 
 # Social account settings
 SOCIALACCOUNT_EMAIL_REQUIRED = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = "none"  # Google already verifies email
-SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"  # Google вже верифікує email
+SOCIALACCOUNT_AUTO_SIGNUP = False  # КРИТИЧНО! Інакше сигнал не спрацює
+SOCIALACCOUNT_LOGIN_ON_GET = False # Видаляємо або змінюємо на False (небезпечно для CSRF)
+SOCIALACCOUNT_STORE_TOKENS = False  # Чи зберігати OAuth токени
+SOCIALACCOUNT_QUERY_EMAIL = True    # Запитувати email якщо відсутній
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -263,5 +266,3 @@ SOCIALACCOUNT_PROVIDERS = {
         'OAUTH_PKCE_ENABLED': True,
     }
 }
-
-SOCIALACCOUNT_LOGIN_ON_GET = True

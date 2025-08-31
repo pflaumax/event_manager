@@ -40,7 +40,7 @@ staticfiles/
 *.sublime-workspace
 
 # Environment variables
-.env
+.env.docker.dev
 .env.*
 
 # macOS files

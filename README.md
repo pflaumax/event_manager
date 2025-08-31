@@ -122,8 +122,8 @@ event_management/
 
 4. **Set up environment variables**
    ```bash
-   cp .env.example .env
-   # Edit .env with your database credentials
+   cp .env.docker.dev.example .env.docker.dev
+   # Edit .env.docker.dev with your database credentials
    ```
 
 5. **Set up your database**
