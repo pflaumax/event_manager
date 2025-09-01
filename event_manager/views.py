@@ -50,6 +50,9 @@ Handlers:
 - 503 Service Unavailable
 """
 
+def fakeadmin(request):
+    context = {}
+    return render(request, "website_app/errors/404.html", context, status=404)
 
 def handler404(request, exception):
     return render(request, "errors/404.html", status=404)
