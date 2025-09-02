@@ -1,28 +1,30 @@
 services:
   db:
     image: postgres:16
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: always
+    env_file:
+      - .env.docker.prod
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
+    networks:
+      - webnet
 
   web:
     build: .
     restart: unless-stopped
     # Чекаємо DB потім запускаємо міграції, collectstatic і gunicorn
     command: >
-      sh -c "./wait-for-it.sh db:5432 -- python manage.py migrate --no-input &&
-             ./wait-for-it.sh db:5432 -- python manage.py collectstatic --no-input &&
-             gunicorn --workers ${GUNICORN_WORKERS:-9} --threads ${GUNICORN_THREADS:-4} --bind 0.0.0.0:8000 event_manager.wsgi:application"
+      sh -c "./wait-for-it.sh db:5432 --
+         python manage.py migrate --no-input &&
+         python manage.py collectstatic --no-input &&
+         gunicorn --workers ${GUNICORN_WORKERS:-9} --threads ${GUNICORN_THREADS:-4} --bind 0.0.0.0:8000 event_manager.wsgi:application"
+
     env_file:
       - .env.docker.prod
     depends_on:
       - db
     volumes:
-      - static_volume:/app/static   # web кладe static сюди
+      - static_volume:/app/staticfiles   # web кладe static сюди
     networks:
       - webnet
 
@@ -35,7 +37,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - static_volume:/app/static:ro   # nginx читає static з того ж тому
+      - static_volume:/app/staticfiles:ro   # nginx читає static з того ж тому
       # - ./nginx/certs:/etc/letsencrypt/live:ro   # якщо certs локально (для HTTP-01)
     depends_on:
       - web

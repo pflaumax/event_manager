@@ -1,4 +1,5 @@
-
+cat > wait-for-it.sh <<'EOF'
+#!/usr/bin/env sh
 set -e
 
 if [ -z "$1" ]; then
@@ -9,6 +10,12 @@ fi
 hostport="$1"
 shift
 
+# If the next token is `--`, skip it (common pattern: script host -- command)
+if [ "$1" = "--" ]; then
+  shift
+fi
+
+# parse host[:port]
 case "$hostport" in
   *:*)
     HOST="${hostport%%:*}"
@@ -33,3 +40,6 @@ done
 
 >&2 echo "Postgres is up - executing command"
 exec "$@"
+EOF
+
+chmod +x wait-for-it.sh

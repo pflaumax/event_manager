@@ -9,11 +9,12 @@ from rest_framework_simplejwt.views import (
 # import debug_toolbar
 from django.conf import settings
 from django.conf.urls.static import static
+from event_manager.views import fakeadmin
 
 urlpatterns = [
     # Admin panel
-    path("admin/", admin.site.urls),
-    # Welcome page
+    path(f"{settings.ADMIN_URL}/", admin.site.urls),
+    path("admin/", fakeadmin),
     path("", views.index, name="index"),
     path("home/", views.home, name="home"),
     # OAuth URLs

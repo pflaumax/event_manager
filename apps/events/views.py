@@ -307,6 +307,11 @@ def register_for_event(
     Raises:
         Http404: If event doesn't exist.
     """
+    
+    if not request.user.is_active:
+        messages.error(request, "You must activate your account before registering for events.")
+        return redirect("users:login") 
+    
     event: Event = get_object_or_404(Event, id=event_id)
 
     # Check if registration is allowed
