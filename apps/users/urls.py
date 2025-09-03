@@ -12,4 +12,5 @@ urlpatterns = [
     path("", include("django.contrib.auth.urls")),
     # Account activation
     path("activate/<uidb64>/<token>/", views.activate, name="activate"),
+    path('resend-activation/', views.resend_activation_request, name='resend_activation_request'),
 ]

@@ -46,3 +46,35 @@ class CustomUserSignupForm(UserCreationForm):
                 }
             ),
         }
+
+
+class ResendActivationForm(forms.Form):
+    """
+    Form for requesting resend of activation email.
+    """
+    email = forms.EmailField(
+        label="Your email",
+        max_length=254,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your email address'
+        }),
+        help_text="Enter the email address you used to register your account."
+    )
+
+    def clean_email(self):
+        """Validate that email exists and is inactive."""
+        email = self.cleaned_data.get('email')
+        if email:
+            from .models import CustomUser
+            try:
+                user = CustomUser.objects.get(email=email)
+                if user.is_active:
+                    raise forms.ValidationError(
+                        "This account is already activated. You can log in directly."
+                    )
+            except CustomUser.DoesNotExist:
+                raise forms.ValidationError(
+                    "No account found with this email address."
+                )
+        return email

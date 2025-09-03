@@ -14,7 +14,7 @@ from .serializers import (
     MyRegistrationsSerializer,
 )
 from apps.events.models import EventRegistration
-
+from apps.users.views import send_activation_email
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     """ViewSet for user management."""
@@ -77,6 +77,12 @@ class CustomUserViewSet(viewsets.ModelViewSet):
 
             user = authenticate(email=email, password=password)
             if user:
+                if not user.is_active:
+                    return Response(
+                        {"detail": "Account is not activated. Please check your email for activation link."},
+                        status=status.HTTP_401_UNAUTHORIZED,
+                    )
+
                 refresh = RefreshToken.for_user(user)
                 return Response(
                     {
@@ -91,6 +97,30 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny])
+    def resend_activation(self, request):
+        """Resend activation email via API"""
+        email = request.data.get("email")
+
+        if not email:
+            return Response(
+                {"detail": "Email is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = CustomUser.objects.get(email=email, is_active=False)
+            send_activation_email(request, user)
+            return Response(
+                {"detail": "Activation email sent! Check your inbox."},
+                status=status.HTTP_200_OK
+            )
+        except CustomUser.DoesNotExist:
+            return Response(
+                {"detail": "No inactive account found with this email."},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
     @action(
         detail=False,

@@ -13,7 +13,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 from apps.events.models import Event, EventRegistration
 from apps.users.models import CustomUser
-from .forms import CustomUserSignupForm
+from .forms import CustomUserSignupForm, ResendActivationForm
 
 # Get the user model (settings.py)
 User = get_user_model()
@@ -106,22 +106,19 @@ def activate(request: HttpRequest, uidb64: str, token: str) -> HttpResponseRedir
     user: Optional[CustomUser] = get_user_from_token(uidb64)
 
     # Check if user exists and the token is valid
-    if user is not None and default_token_generator.check_token(user, token):
-        # Activate the user account
-        user.is_active = True
-        user.save()
+    if user is not None:
+        if user.is_active:
+            messages.info(request, "Your account is already activated. You can log in.")
+            return redirect("users:login")
 
-        messages.success(
-            request, "Your account has been activated successfully! You can now log in."
-        )
-        return redirect("users:login")
-    else:
-        # Invalid or expired link
-        messages.error(
-            request,
-            "The activation link is invalid or has expired. Please try registering again.",
-        )
-        return redirect("index")
+        if default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            messages.success(request, "Your account has been activated successfully! You can now log in.")
+            return redirect("users:login")
+
+    messages.error(request, "The activation link is invalid or has expired.")
+    return redirect("users:resend_activation_request")
 
 
 def send_activation_email(request: HttpRequest, user: CustomUser) -> None:
@@ -158,6 +155,30 @@ def send_activation_email(request: HttpRequest, user: CustomUser) -> None:
 
     # Send the email
     email.send()
+
+def resend_activation_request(request: HttpRequest) -> HttpResponse:
+    """
+    Resend activation email for inactive users.
+    Args:
+        request: HTTP request object
+    Returns:
+        HttpResponse: Rendered form or redirect after sending email
+    """
+    if request.method == "POST":
+        form = ResendActivationForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            try:
+                user = CustomUser.objects.get(email=email, is_active=False)
+                send_activation_email(request, user)
+                messages.success(request, "Activation email sent! Check your inbox.")
+                return redirect("users:login")
+            except CustomUser.DoesNotExist:
+                messages.error(request, "No inactive account found with this email.")
+    else:
+        form = ResendActivationForm()
+
+    return render(request, "registration/resend_activation.html", {"form": form})
 
 
 def get_user_from_token(uidb64: str) -> Optional[CustomUser]:

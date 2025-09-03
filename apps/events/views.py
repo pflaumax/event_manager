@@ -18,6 +18,17 @@ if TYPE_CHECKING:
     from apps.users.models import CustomUser
 
 
+def check_user_active(request):
+    """
+    Helper function to check if user is active.
+    Redirects inactive users to resend activation page.
+    """
+    if request.user.is_authenticated and not request.user.is_active:
+        messages.error(request, "You must activate your account before performing this action.")
+        return redirect("users:resend_activation_request")
+    return None
+
+
 @login_required
 def new_event(request: HttpRequest) -> HttpResponse:
     """
@@ -307,6 +318,10 @@ def register_for_event(
     Raises:
         Http404: If event doesn't exist.
     """
+    active_check = check_user_active(request)
+    if active_check:
+        return active_check
+
     event: Event = get_object_or_404(Event, id=event_id)
 
     # Check if registration is allowed
@@ -388,6 +403,10 @@ def cancel_registration(
     Raises:
         Http404: If event doesn't exist.
     """
+    active_check = check_user_active(request)
+    if active_check:
+        return active_check
+    
     event: Event = get_object_or_404(Event, id=event_id)
     registration: Optional[EventRegistration] = None
 

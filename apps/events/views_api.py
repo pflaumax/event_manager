@@ -147,6 +147,10 @@ class EventRegistrationViewSet(viewsets.ModelViewSet):
         """Visitor registration for event."""
         user = self.request.user
 
+        # Check if user is active
+        if not user.is_active:
+            raise PermissionError("You must activate your account before registering for events")
+
         # Only visitors can register for events
         if user.role != "visitor":
             raise PermissionError("Only Visitors can register for events")
