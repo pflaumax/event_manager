@@ -88,4 +88,7 @@ pgdata/
 postgres-data/
 data/postgres/
 !/nginx/
-!/scripts/backup_pg.sh
+!/scripts/backup_pg.shnginx/conf.d/eventmgr.conf
+scripts/backup_pg.sh
+nginx/conf.d/eventmgr.conf
+scripts/backup_pg.sh

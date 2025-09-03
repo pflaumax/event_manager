@@ -138,7 +138,7 @@ def send_activation_email(request: HttpRequest, user: CustomUser) -> None:
     # Context for template
     context = {
         "user": user,
-        "domain": current_site.domain,
+        "domain": "eventmgr.pflaumax.dev",
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
         "token": default_token_generator.make_token(user),
     }

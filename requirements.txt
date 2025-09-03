@@ -49,3 +49,4 @@ typing_extensions==4.14.0
 tzdata==2025.2
 wcwidth==0.2.13
 whitenoise==6.9.0
+gunicorn

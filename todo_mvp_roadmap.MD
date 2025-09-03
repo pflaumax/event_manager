@@ -86,10 +86,11 @@ Build a basic Django web application where users can:
 - [x] Add API DRF(Django REST framework) for all pages and Postman test
 - [x] Add responsive frontend design (bootstrap)
 - [x] Add export participant lists as CSV files for creators
-- [ ] Deploy to production with Docker and Postgres
-- [ ] Set image upload into production (railway + whitenoise/staticfiles)
+- [x] Deploy to production with Nginx, Gunicorn, Docker
 
 ## After all: ideas to add
 
-- [x] Add OAuth2.0 for user registration and login (Google, GitHub)
+- [x] Add OAuth2.0 for user registration and login (Google)
+- [ ] Implement reset password feature
 - [ ] Add support AI chatbot (OpenAI API, WebSocket)
+- [ ] Set image upload into production
