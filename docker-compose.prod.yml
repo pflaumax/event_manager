@@ -12,7 +12,6 @@ services:
   web:
     build: .
     restart: unless-stopped
-    # Чекаємо DB потім запускаємо міграції, collectstatic і gunicorn
     command: >
       sh -c "./wait-for-it.sh db:5432 --
          python manage.py migrate --no-input &&
@@ -24,7 +23,9 @@ services:
     depends_on:
       - db
     volumes:
-      - static_volume:/app/staticfiles   # web кладe static сюди
+      - ./static:/app/static
+      - static_volume:/app/staticfiles
+      - ./media:/app/media
     networks:
       - webnet
 
@@ -37,7 +38,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - static_volume:/app/staticfiles:ro   # nginx читає static з того ж тому
+      - static_volume:/app/staticfiles:ro
       # - ./nginx/certs:/etc/letsencrypt/live:ro   # якщо certs локально (для HTTP-01)
     depends_on:
       - web
