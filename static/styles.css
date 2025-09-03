@@ -12,6 +12,10 @@
     --shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
+html, body {
+    overflow-x: hidden;
+}
+
 /* Base Styles */
 * {
     margin: 0;
@@ -691,6 +695,9 @@ body {
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+        justify-items: center;
+        align-items: center;
+        gap: 1rem;
     }
 
     .action-buttons {
