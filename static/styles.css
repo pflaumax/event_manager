@@ -667,6 +667,26 @@ body {
         gap: 1rem;
     }
 
+    .stats-section .stat-card {
+    text-align: left;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    }
+
+    .hero-section .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        padding: 0.75rem 1rem;
+        max-width: 90%;
+        box-sizing: border-box;
+    }
+
+    .hero-section .btn-hero i {
+        margin-right: 0.5rem;
+    }
+
     .nav-links.active {
         display: flex;
     }
