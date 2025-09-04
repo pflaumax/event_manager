@@ -17,14 +17,12 @@ services:
          python manage.py migrate --no-input &&
          python manage.py collectstatic --no-input &&
          gunicorn --workers ${GUNICORN_WORKERS:-9} --threads ${GUNICORN_THREADS:-4} --bind 0.0.0.0:8000 event_manager.wsgi:application"
-
     env_file:
       - .env.docker.prod
     depends_on:
       - db
     volumes:
-      - ./static:/app/static
-      - static_volume:/app/staticfiles
+      - ./staticfiles:/app/staticfiles
       - ./media:/app/media
     networks:
       - webnet
@@ -36,10 +34,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - static_volume:/app/staticfiles:ro
-      # - ./nginx/certs:/etc/letsencrypt/live:ro   # якщо certs локально (для HTTP-01)
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
+      - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - web
     networks:
@@ -47,7 +44,6 @@ services:
 
 volumes:
   postgres_data_prod:
-  static_volume:
 
 networks:
   webnet:
