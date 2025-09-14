@@ -1,7 +1,8 @@
 # Event Management System
 
-A Django-based event management platform that brings people together! Whether you're organizing a tech meetup, workshop, or conference, this system makes it easy to create, manage, and attend events.
+A Django-based event management platform that brings people together. Whether you're organizing a tech meetup, workshop, or conference, this system makes it easy to create, manage, and attend events.
 
+## The page available at: [https://eventmgr.pflaumax.dev/](https://eventmgr.pflaumax.dev/)
 ## Table of Contents
 
 - [What This Project Does](#what-this-project-does)
